@@ -1,13 +1,30 @@
-import { RouteGenericInterface } from "./route.ts";
+import { Route } from "./route.ts";
 
-export interface ESRequest<
-  RouteGeneric extends RouteGenericInterface = RouteGenericInterface,
-> {
-  params: RouteGeneric["Params"];
-  query: RouteGeneric["Querystring"];
-  body: RouteGeneric["Body"];
+export function paramsToObject(entries: URLSearchParams) {
+  const result: Record<string, string> = {};
+  for (const [key, value] of entries) {
+    result[key] = value;
+  }
+  return result;
+}
 
-  readonly headers: Headers & RouteGeneric["Headers"]; // this enables the developer to extend the existing http(s|2) headers list
-  readonly url: string;
+export class ESRequest {
+  params: unknown;
+  query: unknown;
+  body: unknown;
+  route: Route | undefined;
+  raw: Request;
+  readonly headers: Headers;
+  readonly url: URL;
+  readonly path: string;
   readonly method: string;
+
+  constructor(rawRequest: Request) {
+    this.raw = rawRequest;
+    const url = new URL(rawRequest.url);
+    this.url = url, this.path = rawRequest.url, this;
+    this.method = rawRequest.method, this.params = {};
+    this.query = paramsToObject(url.searchParams);
+    this.headers = rawRequest.headers, this.body = null;
+  }
 }

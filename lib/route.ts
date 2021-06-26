@@ -1,6 +1,7 @@
 import { ESRequest } from "./request.ts";
-import { Espresso } from "../espresso.ts";
 import { ESReply } from "./reply.ts";
+import { ValidatorFunction } from "./schema.ts";
+import { Espresso } from "../espresso.ts";
 
 export type HTTPMethods =
   | "DELETE"
@@ -11,27 +12,46 @@ export type HTTPMethods =
   | "PUT"
   | "OPTIONS";
 
-export interface RouteOptions<RouteGeneric = RouteGenericInterface> {
-  handler(request: ESRequest<RouteGeneric>, reply: ESReply): unknown;
+
+export type Schema = Record<string, unknown>
+
+export interface RouteInit {
   method: HTTPMethods;
   url: string;
+  schema?: {
+    params?: Schema
+    query?: Schema
+    body?: Schema
+  }
+  handler(request: ESRequest, reply: ESReply): unknown;
 }
 
-export interface RouteGenericInterface {
-  Body?: unknown;
-  Querystring?: unknown;
-  Params?: unknown;
-  Headers?: unknown;
-}
+export class Route {
+  method: HTTPMethods;
+  url: string;
+  schema?: {
+    params?: Schema
+    query?: Schema
+    body?: Schema
+  }
+  validators?: {
+    params?: ValidatorFunction
+    query?: ValidatorFunction
+    body?: ValidatorFunction
+  }
+  handler: RouteInit["handler"];
 
-export function route(this: Espresso, opts: RouteOptions) {
-  this.router.add(opts.method, opts.url, opts)
-}
-
-export async function callHandler(route: RouteOptions, request: ESRequest): Promise<ESReply> {
-  const reply = new ESReply()
-  const body = await route.handler(request, reply)
-  if (body === undefined || body === null) return reply
-  reply.send(body)
-  return reply
+  constructor(app: Espresso, routeInit: RouteInit) {
+    this.method = routeInit.method;
+    this.url = routeInit.url;
+    this.handler = routeInit.handler;
+    this.schema = routeInit.schema;
+    if (this.schema) {
+      this.validators = {
+        params: this.schema.params && app.schemaCompiler(this.schema.params),
+        query: this.schema.query && app.schemaCompiler(this.schema.query),
+        body: this.schema.body && app.schemaCompiler(this.schema.body),
+      }
+    }
+  }
 }
