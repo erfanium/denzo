@@ -4,6 +4,7 @@
    "deno.unstable": true,
    "deno.suggest.imports.autoDiscover": true,
    "deno.suggest.imports.hosts": {
-      "https://esm.sh": false
+      "https://esm.sh": false,
+      "https://raw.githubusercontent.com": false
    }
 }

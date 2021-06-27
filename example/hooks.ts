@@ -32,4 +32,7 @@ app.route({
 });
 
 listen(app, { port: 3000 });
-console.log(app.router.getRoutes());
+
+app.router.getRoutes().forEach((route, path) =>
+  console.log(`${route.method} ${path}`)
+);
