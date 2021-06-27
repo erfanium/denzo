@@ -61,7 +61,7 @@ function serializing(app: Espresso, request: ESRequest, reply: ESReply) {
     new Response(serializedBody, {
       headers: reply.headers,
       status: reply.statusCode,
-    })
+    }),
   );
 }
 
@@ -69,7 +69,7 @@ function callLifecycle(
   lc: Lifecycle,
   app: Espresso,
   request: ESRequest,
-  reply: ESReply
+  reply: ESReply,
 ) {
   return lc(app, request, reply).catch((error) =>
     app.errorHandler(error, request, reply)

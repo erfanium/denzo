@@ -9,10 +9,10 @@ const jsonContentParser: ContentTypeParser = async (request, reply) => {
   try {
     const body = await request.raw.json();
     return body;
-  } catch(e) {
-    reply.status(400).send({ error: 'Syntax error in JSON body' }) // todo
+  } catch (_) {
+    reply.status(400).send({ error: "Syntax error in JSON body" }); // todo
   }
-}
+};
 
 export class ContentTypes {
   default = "text/plain";

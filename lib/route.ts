@@ -12,17 +12,16 @@ export type HTTPMethods =
   | "PUT"
   | "OPTIONS";
 
-
-export type Schema = Record<string, unknown>
+export type Schema = Record<string, unknown>;
 
 export interface RouteInit {
   method: HTTPMethods;
   url: string;
   schema?: {
-    params?: Schema
-    query?: Schema
-    body?: Schema
-  }
+    params?: Schema;
+    query?: Schema;
+    body?: Schema;
+  };
   handler(request: ESRequest, reply: ESReply): unknown;
 }
 
@@ -30,15 +29,15 @@ export class Route {
   method: HTTPMethods;
   url: string;
   schema?: {
-    params?: Schema
-    query?: Schema
-    body?: Schema
-  }
+    params?: Schema;
+    query?: Schema;
+    body?: Schema;
+  };
   validators?: {
-    params?: ValidatorFunction
-    query?: ValidatorFunction
-    body?: ValidatorFunction
-  }
+    params?: ValidatorFunction;
+    query?: ValidatorFunction;
+    body?: ValidatorFunction;
+  };
   handler: RouteInit["handler"];
 
   constructor(app: Espresso, routeInit: RouteInit) {
@@ -46,11 +45,16 @@ export class Route {
     this.url = routeInit.url;
     this.handler = routeInit.handler;
     this.schema = routeInit.schema;
-    if (this.schema) {
-      this.validators = {
-        params: this.schema.params && app.schemaCompiler(this.schema.params),
-        query: this.schema.query && app.schemaCompiler(this.schema.query),
-        body: this.schema.body && app.schemaCompiler(this.schema.body),
+    if (this.schema && Object.keys(this.schema).length > 0) {
+      this.validators = {};
+      if (this.schema.params) {
+        this.validators.params = app.schemaCompiler(this.schema.params);
+      }
+      if (this.schema.query) {
+        this.validators.query = app.schemaCompiler(this.schema.query);
+      }
+      if (this.schema.body) {
+        this.validators.body = app.schemaCompiler(this.schema.body);
       }
     }
   }
