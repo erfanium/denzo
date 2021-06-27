@@ -22,9 +22,9 @@ export function buildRouter(): Router {
   const routes: Map<string, Route> = new Map();
 
   function readNode(node: Node<Route>, prefix = '') {
-    if (node.handler) routes.set('/' + prefix, node.handler);
-    node.children.forEach((node) => {
-      readNode(node, prefix + node.path);
+    if (node.handler) routes.set(prefix + node.path, node.handler);
+    node.children.forEach((child) => {
+      readNode(child, prefix + node.path);
     });
 
     return routes;
