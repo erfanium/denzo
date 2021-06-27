@@ -4,4 +4,4 @@ A Deno framework, similar to Fastify
 
 ## Example
 
-See Example directory
+See [examples](https://github.com/erfanium/espresso/tree/main/example)
