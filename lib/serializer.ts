@@ -1,6 +1,5 @@
 import { ESReply } from "./reply.ts";
 import { ESRequest } from "./request.ts";
-
 export interface ReplySerializer {
   (request: ESRequest, reply: ESReply): BodyInit;
 }

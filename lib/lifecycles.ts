@@ -2,11 +2,16 @@ import { Espresso } from "../espresso.ts";
 import { ESReply } from "./reply.ts";
 import { ESRequest } from "./request.ts";
 
+interface Lifecycle {
+  (app: Espresso, request: ESRequest, reply: ESReply): Promise<void>;
+}
+
 function routing(app: Espresso, request: ESRequest) {
   const [route, params] = app.router.find(request.method, request.url.pathname);
 
   request.params = params;
   request.route = route;
+  return Promise.resolve();
 }
 
 async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
@@ -20,23 +25,23 @@ async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
 }
 
 function validating(_: Espresso, request: ESRequest, reply: ESReply) {
-  if (reply.sent) return; // already sent
-  if (!request.route) return;
-  
+  if (reply.sent) return Promise.resolve(); // already sent
+  if (!request.route) return Promise.resolve();
 
   const validators = request.route.validators;
-  if (!validators) return;
+  if (!validators) return Promise.resolve();
 
   for (const _key in validators) {
-    const key = _key as 'body' | 'params' | 'query'
+    const key = _key as "body" | "params" | "query";
     const validator = validators[key];
     if (!validator) continue;
     const error = validator(request[key]);
     if (!error) continue;
     reply.status(422).send(error);
-    return
+    return Promise.resolve();
   }
 
+  return Promise.resolve();
 }
 
 async function handling(_: Espresso, request: ESRequest, reply: ESReply) {
@@ -56,19 +61,25 @@ function serializing(app: Espresso, request: ESRequest, reply: ESReply) {
     new Response(serializedBody, {
       headers: reply.headers,
       status: reply.statusCode,
-    }),
+    })
   );
 }
 
-export async function start(
+function callLifecycle(
+  lc: Lifecycle,
   app: Espresso,
-  { request: rawRequest, respondWith }: Deno.RequestEvent,
+  request: ESRequest,
+  reply: ESReply
 ) {
-  const reply = new ESReply(respondWith);
-  const request = new ESRequest(rawRequest);
-  routing(app, request);
-  await parsing(app, request, reply);
-  validating(app, request, reply);
-  await handling(app, request, reply);
+  return lc(app, request, reply).catch((error) =>
+    app.errorHandler(error, request, reply)
+  );
+}
+
+export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
+  await callLifecycle(routing, app, request, reply);
+  await callLifecycle(parsing, app, request, reply);
+  await callLifecycle(validating, app, request, reply);
+  await callLifecycle(handling, app, request, reply);
   serializing(app, request, reply);
 }
