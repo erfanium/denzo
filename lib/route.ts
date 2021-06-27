@@ -13,7 +13,8 @@ export type HTTPMethods =
   | "PUT"
   | "OPTIONS";
 
-export type Schema = Record<string, unknown>;
+// deno-lint-ignore ban-types
+export type Schema = Object;
 
 export interface RouteInit {
   method: HTTPMethods;

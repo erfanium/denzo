@@ -10,14 +10,18 @@ export interface ValidatorFunction {
 }
 
 export interface SchemaCompiler {
-  (schema: unknown): ValidatorFunction;
+  // deno-lint-ignore no-explicit-any
+  (schema: any): ValidatorFunction;
 }
 
 export function buildAjvSchemaCompiler(): SchemaCompiler {
   const ajv = new Ajv();
   return (schema) => {
-    // deno-lint-ignore no-explicit-any
-    const check = ajv.compile(schema as any);
+    if ("isFluentSchema" in schema) {
+      schema = schema.valueOf();
+    }
+
+    const check = ajv.compile(schema);
     return (params) => {
       const result = check(params);
       if (result) return null;

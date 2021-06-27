@@ -1,4 +1,4 @@
-import { Espresso, listen, makeKey } from "../mod.ts";
+import { Espresso, listen } from "../mod.ts";
 
 const app = new Espresso();
 
