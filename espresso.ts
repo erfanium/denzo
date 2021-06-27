@@ -1,5 +1,6 @@
 import { ContentTypes } from "./lib/contentTypes.ts";
 import { defaultErrorHandler, ErrorHandler } from "./lib/errorHandler.ts";
+import { addHook, Hook, HookNames, HookStorage } from "./lib/hooks.ts";
 import { start } from "./lib/lifecycles.ts";
 import { Plugin } from "./lib/plugin.ts";
 import { ESReply } from "./lib/reply.ts";
@@ -31,6 +32,7 @@ export class Espresso {
   schemaCompiler: SchemaCompiler;
   serializer: ReplySerializer;
   errorHandler: ErrorHandler;
+  hooks: HookStorage = {};
 
   constructor(init: EspressoInit = {}) {
     this.root = init.root === undefined ? true : init.root;
@@ -65,5 +67,9 @@ export class Espresso {
     });
 
     plugin(newScope);
+  }
+
+  addHook(name: HookNames, hook: Hook) {
+    addHook(this.hooks, name, hook);
   }
 }

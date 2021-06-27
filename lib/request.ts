@@ -1,3 +1,4 @@
+import { findKey, getKey, Key, Meta, setKey } from "./keys.ts";
 import { Route } from "./route.ts";
 
 export function paramsToObject(entries: URLSearchParams) {
@@ -18,6 +19,7 @@ export class ESRequest {
   readonly url: URL;
   readonly path: string;
   readonly method: string;
+  meta: Meta = {};
 
   constructor(rawRequest: Request) {
     this.raw = rawRequest;
@@ -26,5 +28,17 @@ export class ESRequest {
     this.method = rawRequest.method, this.params = {};
     this.query = paramsToObject(url.searchParams);
     this.headers = rawRequest.headers, this.body = null;
+  }
+
+  set<T>(key: Key<T>, data: T) {
+    setKey(this.meta, key, data);
+  }
+
+  get<T>(key: Key<T>): T {
+    return getKey(this.meta, key);
+  }
+
+  find<T>(key: Key<T>): T | undefined {
+    return findKey(this.meta, key);
   }
 }

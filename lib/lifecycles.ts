@@ -1,4 +1,5 @@
 import { Espresso } from "../espresso.ts";
+import { callHook, callHook as _callHook, HookNames } from "./hooks.ts";
 import { ESReply } from "./reply.ts";
 import { ESRequest } from "./request.ts";
 
@@ -6,7 +7,8 @@ interface Lifecycle {
   (app: Espresso, request: ESRequest, reply: ESReply): Promise<void>;
 }
 
-function routing(app: Espresso, request: ESRequest) {
+// LC
+function routing(app: Espresso, request: ESRequest, _reply: ESReply) {
   const [route, params] = app.router.find(request.method, request.url.pathname);
 
   request.params = params;
@@ -14,6 +16,7 @@ function routing(app: Espresso, request: ESRequest) {
   return Promise.resolve();
 }
 
+// LC
 async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
   if (reply.sent) return; // already sent
   const parser = app.contentTypes.findParser(request);
@@ -24,6 +27,7 @@ async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
   request.body = await parser(request, reply);
 }
 
+// LC
 function validating(_: Espresso, request: ESRequest, reply: ESReply) {
   if (reply.sent) return Promise.resolve(); // already sent
   if (!request.route) return Promise.resolve();
@@ -44,7 +48,8 @@ function validating(_: Espresso, request: ESRequest, reply: ESReply) {
   return Promise.resolve();
 }
 
-async function handling(_: Espresso, request: ESRequest, reply: ESReply) {
+// LC
+async function handling(app: Espresso, request: ESRequest, reply: ESReply) {
   if (reply.sent) return; // already sent
   if (!request.route) {
     return reply.status(404).send();
@@ -55,6 +60,7 @@ async function handling(_: Espresso, request: ESRequest, reply: ESReply) {
   reply.send(body);
 }
 
+// LC
 function serializing(app: Espresso, request: ESRequest, reply: ESReply) {
   const serializedBody = app.serializer(request, reply);
   reply.responseWith(
@@ -65,7 +71,7 @@ function serializing(app: Espresso, request: ESRequest, reply: ESReply) {
   );
 }
 
-function callLifecycle(
+function execLC(
   lc: Lifecycle,
   app: Espresso,
   request: ESRequest,
@@ -76,10 +82,23 @@ function callLifecycle(
   );
 }
 
+function execHook(
+  name: HookNames,
+  app: Espresso,
+  request: ESRequest,
+  reply: ESReply,
+) {
+  return callHook(name, request, reply, app.hooks, request.route?.hooks).catch((
+    error,
+  ) => app.errorHandler(error, request, reply));
+}
+
 export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
-  await callLifecycle(routing, app, request, reply);
-  await callLifecycle(parsing, app, request, reply);
-  await callLifecycle(validating, app, request, reply);
-  await callLifecycle(handling, app, request, reply);
+  await execLC(routing, app, request, reply);
+  await execHook("onRequest", app, request, reply);
+  await execLC(parsing, app, request, reply);
+  await execLC(validating, app, request, reply);
+  await execHook("preHandler", app, request, reply);
+  await execLC(handling, app, request, reply);
   serializing(app, request, reply);
 }

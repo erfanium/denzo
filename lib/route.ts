@@ -2,6 +2,7 @@ import { ESRequest } from "./request.ts";
 import { ESReply } from "./reply.ts";
 import { ValidatorFunction } from "./schema.ts";
 import { Espresso } from "../espresso.ts";
+import { Hook, HookStorage } from "./hooks.ts";
 
 export type HTTPMethods =
   | "DELETE"
@@ -23,6 +24,13 @@ export interface RouteInit {
     body?: Schema;
   };
   handler(request: ESRequest, reply: ESReply): unknown;
+  onRequest?: Hook | Hook[];
+  preHandler?: Hook | Hook[];
+}
+
+function toArray<T>(i: T | T[]): T[] {
+  if (Array.isArray(i)) return i;
+  return [i];
 }
 
 export class Route {
@@ -39,12 +47,15 @@ export class Route {
     body?: ValidatorFunction;
   };
   handler: RouteInit["handler"];
+  hooks: HookStorage = {};
 
-  constructor(app: Espresso, routeInit: RouteInit) {
-    this.method = routeInit.method;
-    this.url = routeInit.url;
-    this.handler = routeInit.handler;
-    this.schema = routeInit.schema;
+  constructor(app: Espresso, init: RouteInit) {
+    this.method = init.method;
+    this.url = init.url;
+    this.handler = init.handler;
+    this.schema = init.schema;
+
+    // schema
     if (this.schema && Object.keys(this.schema).length > 0) {
       this.validators = {};
       if (this.schema.params) {
@@ -57,5 +68,9 @@ export class Route {
         this.validators.body = app.schemaCompiler(this.schema.body);
       }
     }
+
+    // hooks
+    if (init.onRequest) this.hooks["onRequest"] = toArray(init.onRequest);
+    if (init.preHandler) this.hooks["preHandler"] = toArray(init.preHandler);
   }
 }
