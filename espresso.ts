@@ -9,6 +9,7 @@ import { Route, RouteInit } from "./lib/route.ts";
 import { buildRouter, Router } from "./lib/router.ts";
 import { buildAjvSchemaCompiler, SchemaCompiler } from "./lib/schema.ts";
 import { defaultSerializer, ReplySerializer } from "./lib/serializer.ts";
+import { serve } from "./lib/server.ts";
 
 export interface EspressoInit {
   root?: boolean;
@@ -42,6 +43,10 @@ export class Espresso {
     this.schemaCompiler = init.schemaCompiler || buildAjvSchemaCompiler();
     this.serializer = init.serializer || defaultSerializer;
     this.errorHandler = init.errorHandler || defaultErrorHandler;
+  }
+
+  serve(listener: Deno.Listener) {
+    serve(this, listener);
   }
 
   route(routeInit: RouteInit) {
