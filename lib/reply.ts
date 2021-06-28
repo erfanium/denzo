@@ -2,11 +2,15 @@ interface ResponseWith {
   (r: Response | Promise<Response>): Promise<void>;
 }
 
-export class ESReply {
+export interface DefaultReplyTypes {
+  Response?: unknown
+}
+
+export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
   responseWith: ResponseWith;
   sent = false;
   statusCode = 200;
-  body: unknown;
+  body: T['Response'] | undefined = undefined;
   headers = new Headers();
 
   constructor(rw: ResponseWith) {
@@ -18,7 +22,7 @@ export class ESReply {
     return this;
   }
 
-  send(s?: unknown) {
+  send(s?: T['Response']) {
     if (this.sent) return;
     this.body = s;
     this.sent = true;

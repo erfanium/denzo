@@ -2,21 +2,30 @@ import { Espresso } from "../mod.ts";
 
 const app = new Espresso();
 
-app.route({
-  method: "GET",
-  url: "/concat",
+interface RouteTypes {
+  Body: {
+    a: number;
+    b: number;
+  };
+  Response: {
+    result: number;
+  };
+}
+
+app.route<RouteTypes>({
+  method: "POST",
+  url: "/sum",
   schema: {
     query: {
       type: "object",
       properties: {
-        a: { type: "string" },
-        b: { type: "string" },
+        a: { type: "number" },
+        b: { type: "number" },
       },
       required: ["a", "b"],
     },
   },
-  handler(request) {
-    const body = request.query as any;
+  handler({ body }) {
     return {
       result: body.a + body.b,
     };
@@ -26,7 +35,7 @@ app.route({
 const listener = Deno.listen({ port: 3000 });
 app.serve(listener);
 
-console.log('On port 3030')
-app.router.getRoutes().forEach((route, path) =>
-  console.log(`${route.method} ${path}`)
-);
+console.log("On port 3030");
+app.router
+  .getRoutes()
+  .forEach((route, path) => console.log(`${route.method} ${path}`));

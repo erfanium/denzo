@@ -5,7 +5,7 @@ import { start } from "./lib/lifecycles.ts";
 import { Plugin } from "./lib/plugin.ts";
 import { ESReply } from "./lib/reply.ts";
 import { ESRequest } from "./lib/request.ts";
-import { Route, RouteInit } from "./lib/route.ts";
+import { DefaultRouteTypes, Route, RouteInit } from "./lib/route.ts";
 import { buildRouter, Router } from "./lib/router.ts";
 import { buildAjvSchemaCompiler, SchemaCompiler } from "./lib/schema.ts";
 import { defaultSerializer, ReplySerializer } from "./lib/serializer.ts";
@@ -49,7 +49,7 @@ export class Espresso {
     serve(this, listener);
   }
 
-  route(routeInit: RouteInit) {
+  route<T extends DefaultRouteTypes = DefaultRouteTypes>(routeInit: RouteInit<T>) {
     const route = new Route(this, routeInit);
     this.router.add(route.method, this.prefix + route.url, route);
   }

@@ -16,7 +16,14 @@ export type HTTPMethods =
 // deno-lint-ignore ban-types
 export type Schema = Object;
 
-export interface RouteInit {
+export interface DefaultRouteTypes {
+  Params?: unknown;
+  Body?: unknown;
+  Query?: unknown;
+  Response?: unknown;
+}
+
+export interface RouteInit<T extends DefaultRouteTypes> {
   method: HTTPMethods;
   url: string;
   schema?: {
@@ -24,7 +31,10 @@ export interface RouteInit {
     query?: Schema;
     body?: Schema;
   };
-  handler(request: ESRequest, reply: ESReply): unknown;
+  handler(
+    request: ESRequest<T>,
+    reply: ESReply<T>,
+  ): T["Response"] | Promise<T["Response"]> | void | Promise<void>;
   onRequest?: Hook | Hook[];
   preHandler?: Hook | Hook[];
 }
@@ -34,7 +44,7 @@ function toArray<T>(i: T | T[]): T[] {
   return [i];
 }
 
-export class Route {
+export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
   method: HTTPMethods;
   url: string;
   schema?: {
@@ -47,10 +57,10 @@ export class Route {
     query?: ValidatorFunction;
     body?: ValidatorFunction;
   };
-  handler: RouteInit["handler"];
+  handler: RouteInit<T>["handler"];
   hooks: HookStorage = {};
 
-  constructor(app: Espresso, init: RouteInit) {
+  constructor(app: Espresso, init: RouteInit<T>) {
     this.method = init.method;
     this.url = init.url;
     this.handler = init.handler;

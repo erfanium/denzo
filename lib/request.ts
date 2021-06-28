@@ -9,10 +9,15 @@ export function paramsToObject(entries: URLSearchParams) {
   return result;
 }
 
-export class ESRequest {
-  params: unknown;
-  query: unknown;
-  body: unknown;
+export interface DefaultRequestTypes {
+  Params?: unknown
+  Body?: unknown
+  Query?: unknown
+}
+export class ESRequest<T extends DefaultRequestTypes = DefaultRequestTypes> {
+  params: T['Params'];
+  query: T['Query'];
+  body: T['Body'];
   route: Route | undefined;
   raw: Request;
   readonly headers: Headers;

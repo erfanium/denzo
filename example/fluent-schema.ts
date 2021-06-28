@@ -3,7 +3,17 @@ import { Espresso } from "../mod.ts";
 
 const app = new Espresso();
 
-app.route({
+interface RouteTypes {
+  Query: {
+    a: string;
+    b: string;
+  };
+  Response: {
+    result: string;
+  };
+}
+
+app.route<RouteTypes>({
   method: "GET",
   url: "/concat",
   schema: {
@@ -12,7 +22,7 @@ app.route({
       .prop("b", S.string().required()),
   },
   handler(request) {
-    const body = request.query as any;
+    const body = request.query;
     return {
       result: body.a + body.b,
     };
@@ -22,7 +32,7 @@ app.route({
 const listener = Deno.listen({ port: 3000 });
 app.serve(listener);
 
-console.log('On port 3030')
+console.log("On port 3030");
 app.router.getRoutes().forEach((route, path) =>
   console.log(`${route.method} ${path}`)
 );
