@@ -6,7 +6,7 @@ export interface Key<T> {
   getValue(meta: Meta): T | undefined;
 }
 
-export function makeKey<T>(name: string): Key<T> {
+export function createKey<T>(name: string): Key<T> {
   const s = Symbol(name);
   return {
     name,

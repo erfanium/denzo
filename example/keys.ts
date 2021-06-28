@@ -1,9 +1,9 @@
-import { Espresso, makeKey } from "../mod.ts";
+import { Espresso, createKey } from "../mod.ts";
 
 const app = new Espresso();
 
-const userIdKey = makeKey<number>("userId");
-const userLanguageKey = makeKey<string>("userLanguage");
+const userIdKey = createKey<number>("userId");
+const userLanguageKey = createKey<string>("userLanguage");
 
 app.addHook("onRequest", (request) => {
   request.set(userIdKey, 12345);
