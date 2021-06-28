@@ -3,15 +3,7 @@ import { ESReply } from "./reply.ts";
 import { ValidatorFunction } from "./schema.ts";
 import { Espresso } from "../espresso.ts";
 import { Hook, HookStorage } from "./hooks.ts";
-
-export type HTTPMethods =
-  | "DELETE"
-  | "GET"
-  | "HEAD"
-  | "PATCH"
-  | "POST"
-  | "PUT"
-  | "OPTIONS";
+import { HTTPMethods } from "./httpMethods.ts";
 
 // deno-lint-ignore ban-types
 export type Schema = Object;
@@ -47,6 +39,7 @@ function toArray<T>(i: T | T[]): T[] {
 export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
   method: HTTPMethods;
   url: string;
+  finalUrl: string;
   schema?: {
     params?: Schema;
     query?: Schema;
@@ -63,6 +56,7 @@ export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
   constructor(app: Espresso, init: RouteInit<T>) {
     this.method = init.method;
     this.url = init.url;
+    this.finalUrl = app.prefix + init.url;
     this.handler = init.handler;
     this.schema = init.schema;
 

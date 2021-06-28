@@ -1,4 +1,5 @@
 import { Node } from "../deps.ts";
+import { HTTPMethods } from "./httpMethods.ts";
 import { Route } from "./route.ts";
 
 type Params = Record<string, string>;
@@ -11,68 +12,68 @@ function hasTrailingSlash(str: string): boolean {
   return false;
 }
 
-export interface Router {
-  add(method: string, path: string, route: Route): void;
-  find(method: string, path: string): [Route, Params] | [];
-  getRoutes(): Map<string, Route>;
-}
+export type RouteTrees = Record<string, Node<Route>>;
 
-export function buildRouter(): Router {
-  const trees: Record<string, Node<Route>> = {};
-  const routes: Map<string, Route> = new Map();
-
-  function readNode(node: Node<Route>, prefix = '') {
-    if (node.handler) routes.set(prefix + node.path, node.handler);
-    node.children.forEach((child) => {
-      readNode(child, prefix + node.path);
-    });
-
-    return routes;
+export function addRoute(
+  routeTrees: RouteTrees,
+  method: HTTPMethods,
+  path: string,
+  route: Route,
+): void {
+  if (path[0] !== "/") {
+    path = `/${path}`;
   }
 
-  return {
-    add(method: string, path: string, route: Route) {
-      if (path[0] !== "/") {
-        path = `/${path}`;
-      }
+  if (hasTrailingSlash(path)) {
+    path = path.slice(0, path.length - 1);
+  }
 
-      if (hasTrailingSlash(path)) {
-        path = path.slice(0, path.length - 1);
-      }
+  let root = routeTrees[method];
+  if (!root) {
+    root = new Node();
+    routeTrees[method] = root;
+  }
 
-      let root = trees[method];
-      if (!root) {
-        root = new Node();
-        trees[method] = root;
-      }
+  root.add(path, route);
+}
 
-      root.add(path, route);
-    },
-    find(method: string, path: string) {
-      const node = trees[method];
-      if (!node) return [];
+export function findRoute(
+  routeTrees: RouteTrees,
+  method: HTTPMethods,
+  path: string,
+): [Route, Params] | [] {
+  const node = routeTrees[method];
+  if (!node) return [];
 
-      if (hasTrailingSlash(path)) {
-        path = path.slice(0, path.length - 1);
-      }
+  if (hasTrailingSlash(path)) {
+    path = path.slice(0, path.length - 1);
+  }
 
-      const [handle, paramsMap] = node.find(path);
-      if (!handle) return [];
+  const [handle, paramsMap] = node.find(path);
+  if (!handle) return [];
 
-      let params: Params | undefined;
-      if (paramsMap) params = Object.fromEntries(paramsMap);
+  let params: Params | undefined;
+  if (paramsMap) params = Object.fromEntries(paramsMap);
 
-      return [handle, params!];
-    },
-    getRoutes() {
-      const routes: Map<string, Route> = new Map();
-      for (const method in trees) {
-        readNode(trees[method]).forEach((route, path) => {
-          routes.set(path, route);
-        });
-      }
+  return [handle, params!];
+}
 
-      return routes;
-    },
-  };
+function readNode(node: Node<Route>, routes: Map<string, Route>, prefix = "") {
+  if (node.handler) routes.set(prefix + node.path, node.handler);
+  node.children.forEach((child) => {
+    readNode(child, routes, prefix + node.path);
+  });
+
+  return routes;
+}
+
+export function getRoutes(routeTrees: RouteTrees): Map<string, Route> {
+  const routes: Map<string, Route> = new Map();
+  for (const method in routeTrees) {
+    readNode(routeTrees[method], routes).forEach((route, path) => {
+      routes.set(path, route);
+    });
+  }
+
+  return routes;
 }

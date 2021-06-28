@@ -1,4 +1,4 @@
-import { Espresso, createKey } from "../mod.ts";
+import { createKey, Espresso } from "../mod.ts";
 
 const app = new Espresso();
 
@@ -23,7 +23,7 @@ app.route({
 const listener = Deno.listen({ port: 3000 });
 app.serve(listener);
 
-console.log('On port 3030')
-app.router.getRoutes().forEach((route, path) =>
+console.log("On port 3030");
+app.getRoutes().forEach((route, path) =>
   console.log(`${route.method} ${path}`)
 );

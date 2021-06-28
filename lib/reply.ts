@@ -3,14 +3,14 @@ interface ResponseWith {
 }
 
 export interface DefaultReplyTypes {
-  Response?: unknown
+  Response?: unknown;
 }
 
 export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
   responseWith: ResponseWith;
   sent = false;
   statusCode = 200;
-  body: T['Response'] | undefined = undefined;
+  body: T["Response"] | undefined = undefined;
   headers = new Headers();
 
   constructor(rw: ResponseWith) {
@@ -22,7 +22,7 @@ export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
     return this;
   }
 
-  send(s?: T['Response']) {
+  send(s?: T["Response"]) {
     if (this.sent) return;
     this.body = s;
     this.sent = true;

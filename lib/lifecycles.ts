@@ -2,6 +2,7 @@ import { Espresso } from "../espresso.ts";
 import { callHook, callHook as _callHook, HookNames } from "./hooks.ts";
 import { ESReply } from "./reply.ts";
 import { ESRequest } from "./request.ts";
+import { findRoute } from "./router.ts";
 
 interface Lifecycle {
   (app: Espresso, request: ESRequest, reply: ESReply): Promise<void>;
@@ -9,7 +10,11 @@ interface Lifecycle {
 
 // LC
 function routing(app: Espresso, request: ESRequest, _reply: ESReply) {
-  const [route, params] = app.router.find(request.method, request.url.pathname);
+  const [route, params] = findRoute(
+    app.routeTrees,
+    request.method,
+    request.url.pathname,
+  );
 
   request.params = params;
   request.route = route;
@@ -19,9 +24,16 @@ function routing(app: Espresso, request: ESRequest, _reply: ESReply) {
 // LC
 async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
   if (reply.sent) return; // already sent
-  const parser = app.contentTypes.findParser(request);
+  if (request.method === "GET") return; // GET requests have no body
+  const contentType = request.headers.get("content-type") ||
+    app.defaultContentType;
+  const parser = app.contentTypeParsers.get(contentType);
   if (!parser) {
-    throw new Error("No parser"); // todo
+    reply.status(400).send({
+      error: "BAD_CONTENT_TYPE",
+      message: `No content type parser found for '${contentType}'`,
+    });
+    return;
   }
 
   request.body = await parser(request, reply);
@@ -49,7 +61,7 @@ function validating(_: Espresso, request: ESRequest, reply: ESReply) {
 }
 
 // LC
-async function handling(app: Espresso, request: ESRequest, reply: ESReply) {
+async function handling(_: Espresso, request: ESRequest, reply: ESReply) {
   if (reply.sent) return; // already sent
   if (!request.route) {
     return reply.status(404).send();
@@ -61,9 +73,9 @@ async function handling(app: Espresso, request: ESRequest, reply: ESReply) {
 }
 
 // LC
-function serializing(app: Espresso, request: ESRequest, reply: ESReply) {
+async function serializing(app: Espresso, request: ESRequest, reply: ESReply) {
   const serializedBody = app.serializer(request, reply);
-  reply.responseWith(
+  await reply.responseWith(
     new Response(serializedBody, {
       headers: reply.headers,
       status: reply.statusCode,
@@ -97,8 +109,10 @@ export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
   await execLC(routing, app, request, reply);
   await execHook("onRequest", app, request, reply);
   await execLC(parsing, app, request, reply);
+  await execHook("preValidation", app, request, reply);
   await execLC(validating, app, request, reply);
   await execHook("preHandler", app, request, reply);
   await execLC(handling, app, request, reply);
-  serializing(app, request, reply);
+  await execHook("preSerialization", app, request, reply);
+  await execLC(serializing, app, request, reply);
 }
