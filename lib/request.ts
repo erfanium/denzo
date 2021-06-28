@@ -25,7 +25,7 @@ export class ESRequest<T extends DefaultRequestTypes = DefaultRequestTypes> {
   readonly url: URL;
   readonly path: string;
   readonly method: HTTPMethods;
-  meta: Meta = {};
+  protected meta: Meta = {};
 
   constructor(rawRequest: Request) {
     this.raw = rawRequest;
