@@ -62,9 +62,9 @@ export class Espresso {
   }
 
   handle({ request: rawRequest, respondWith }: Deno.RequestEvent) {
-    const reply = new ESReply(respondWith);
+    const reply = new ESReply();
     const request = new ESRequest(rawRequest);
-    return start(this, request, reply);
+    return start(this, request, reply).then(respondWith);
   }
 
   getRoutes() {

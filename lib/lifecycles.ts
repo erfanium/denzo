@@ -90,17 +90,6 @@ async function handling(app: Espresso, request: ESRequest, reply: ESReply) {
   reply.send(body);
 }
 
-// LC
-async function serializing(app: Espresso, request: ESRequest, reply: ESReply) {
-  const serializedBody = app.serializer(request, reply);
-  await reply.responseWith(
-    new Response(serializedBody, {
-      headers: reply.headers,
-      status: reply.statusCode,
-    }),
-  );
-}
-
 //LC
 async function errorHandling(
   app: Espresso,
@@ -134,8 +123,12 @@ export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
     );
   } catch (error) {
     await errorHandling(app, request, reply, error);
-  } finally {
-    await serializing(app, request, reply);
-    reply.responseTime = performance.now() - reply.createdAt;
   }
+
+  const serializedBody = app.serializer(request, reply);
+  reply.responseTime = performance.now() - reply.createdAt;
+  return new Response(serializedBody, {
+    headers: reply.headers,
+    status: reply.statusCode,
+  });
 }

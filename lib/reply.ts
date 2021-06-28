@@ -7,17 +7,12 @@ export interface DefaultReplyTypes {
 }
 
 export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
-  responseWith: ResponseWith;
   sent = false;
   statusCode = 200;
   body: T["Response"] | undefined = undefined;
   headers = new Headers();
   createdAt = performance.now();
   responseTime = 0;
-
-  constructor(rw: ResponseWith) {
-    this.responseWith = rw;
-  }
 
   header(key: string, value: string) {
     this.headers.set(key, value);
