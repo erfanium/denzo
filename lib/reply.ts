@@ -19,6 +19,11 @@ export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
     this.responseWith = rw;
   }
 
+  header(key: string, value: string) {
+    this.headers.set(key, value);
+    return this;
+  }
+
   code(s: number) {
     this.statusCode = s;
     return this;
@@ -28,5 +33,9 @@ export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
     if (this.sent) return;
     this.body = s;
     this.sent = true;
+  }
+
+  redirect(url: string, statusCode = 302) {
+    this.header("location", url).code(statusCode).send();
   }
 }
