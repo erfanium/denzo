@@ -39,7 +39,7 @@ app.route({
   method: "GET",
   url: "/error",
   handler() {
-    throw new Error('eeee')
+    throw new Error("eeee");
   },
 });
 

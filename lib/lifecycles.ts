@@ -65,7 +65,7 @@ async function validating(app: Espresso, request: ESRequest, reply: ESReply) {
     if (!error) continue;
     reply.code(400).send({
       errorCode: "VALIDATION_ERROR",
-      message: key + ' ' + error.message,
+      message: key + " " + error.message,
     });
     return;
   }
@@ -140,5 +140,6 @@ export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
     await errorHandling(app, request, reply, error);
   } finally {
     await serializing(app, request, reply);
+    reply.responseTime = performance.now() - reply.createdAt;
   }
 }

@@ -16,8 +16,8 @@ export const defaultErrorHandler: ErrorHandler = (error, _, reply) => {
   }
 
   reply.code(500).send({
-    errorCode: 'INTERNAL_SERVER_ERROR',
-    message: error?.message
+    errorCode: "INTERNAL_SERVER_ERROR",
+    message: error?.message,
   });
   return Promise.resolve();
 };
