@@ -19,6 +19,10 @@ app.addHook("preHandler", async () => {
   await delay(500);
 });
 
+app.addHook("onError", (_request, _reply, error) => {
+  console.log("onError", error);
+});
+
 app.route({
   method: "GET",
   url: "/hi",
@@ -28,6 +32,14 @@ app.route({
   },
   handler() {
     return { hello: "world!" };
+  },
+});
+
+app.route({
+  method: "GET",
+  url: "/error",
+  handler() {
+    throw new Error('eeee')
   },
 });
 

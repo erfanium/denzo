@@ -9,8 +9,8 @@ const jsonCP: ContentTypeParser = async (request, reply) => {
   try {
     const body = await request.raw.json();
     return body;
-  } catch (_) {
-    reply.status(400).send({ error: "Syntax error in JSON body" }); // todo
+  } catch (e) {
+    reply.code(400).send({ errorCode: "BAD_JSON", message: e.message }); // todo
   }
 };
 
@@ -18,8 +18,8 @@ const textCP: ContentTypeParser = async (request, reply) => {
   try {
     const body = await request.raw.text();
     return body;
-  } catch (_) {
-    reply.status(400).send({ error: "Syntax error in text body" }); // todo
+  } catch (e) {
+    reply.code(400).send({ errorCode: "BAD_BODY", message: e.message }); // todo
   }
 };
 

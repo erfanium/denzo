@@ -16,7 +16,7 @@ app.route<RouteTypes>({
   method: "POST",
   url: "/sum",
   schema: {
-    query: {
+    body: {
       type: "object",
       properties: {
         a: { type: "number" },

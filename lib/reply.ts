@@ -17,7 +17,7 @@ export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
     this.responseWith = rw;
   }
 
-  status(s: number) {
+  code(s: number) {
     this.statusCode = s;
     return this;
   }

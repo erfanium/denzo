@@ -1,10 +1,10 @@
 export class ESError extends Error {
-  code: string;
+  errorCode: string;
   statusCode: number;
-  constructor(code: string, statusCode: number, message: string) {
+  constructor(errorCode: string, statusCode: number, message: string) {
     super(message);
-    this.name = code;
-    this.code = code;
+    this.name = errorCode;
+    this.errorCode = errorCode;
     this.statusCode = statusCode;
   }
 }

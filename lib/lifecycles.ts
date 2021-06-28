@@ -1,5 +1,5 @@
 import { Espresso } from "../espresso.ts";
-import { callHook, callHook as _callHook, HookNames } from "./hooks.ts";
+import { callHook, callHook as _callHook } from "./hooks.ts";
 import { ESReply } from "./reply.ts";
 import { ESRequest } from "./request.ts";
 import { findRoute } from "./router.ts";
@@ -9,7 +9,7 @@ interface Lifecycle {
 }
 
 // LC
-function routing(app: Espresso, request: ESRequest, _reply: ESReply) {
+async function routing(app: Espresso, request: ESRequest, reply: ESReply) {
   const [route, params] = findRoute(
     app.routeTrees,
     request.method,
@@ -18,7 +18,9 @@ function routing(app: Espresso, request: ESRequest, _reply: ESReply) {
 
   request.params = params;
   request.route = route;
-  return Promise.resolve();
+
+  await callHook("onRequest", request, reply, app.hooks, request.route?.hooks);
+  return;
 }
 
 // LC
@@ -29,8 +31,8 @@ async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
     app.defaultContentType;
   const parser = app.contentTypeParsers.get(contentType);
   if (!parser) {
-    reply.status(400).send({
-      error: "BAD_CONTENT_TYPE",
+    reply.code(400).send({
+      errorCode: "BAD_CONTENT_TYPE",
       message: `No content type parser found for '${contentType}'`,
     });
     return;
@@ -40,12 +42,20 @@ async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
 }
 
 // LC
-function validating(_: Espresso, request: ESRequest, reply: ESReply) {
-  if (reply.sent) return Promise.resolve(); // already sent
-  if (!request.route) return Promise.resolve();
+async function validating(app: Espresso, request: ESRequest, reply: ESReply) {
+  if (reply.sent) return; // already sent
+  if (!request.route) return;
+
+  await callHook(
+    "preValidation",
+    request,
+    reply,
+    app.hooks,
+    request.route?.hooks,
+  );
 
   const validators = request.route.validators;
-  if (!validators) return Promise.resolve();
+  if (!validators) return;
 
   for (const _key in validators) {
     const key = _key as "body" | "params" | "query";
@@ -53,18 +63,30 @@ function validating(_: Espresso, request: ESRequest, reply: ESReply) {
     if (!validator) continue;
     const error = validator(request[key]);
     if (!error) continue;
-    reply.status(422).send(error);
-    return Promise.resolve();
+    reply.code(400).send({
+      errorCode: "VALIDATION_ERROR",
+      message: key + ' ' + error.message,
+    });
+    return;
   }
 
-  return Promise.resolve();
+  return;
 }
 
 // LC
-async function handling(_: Espresso, request: ESRequest, reply: ESReply) {
+async function handling(app: Espresso, request: ESRequest, reply: ESReply) {
   if (reply.sent) return; // already sent
+
+  await callHook(
+    "preHandler",
+    request,
+    reply,
+    app.hooks,
+    request.route?.hooks,
+  );
+
   if (!request.route) {
-    return reply.status(404).send();
+    return reply.code(404).send();
   }
 
   const body = await request.route.handler(request, reply);
@@ -83,36 +105,40 @@ async function serializing(app: Espresso, request: ESRequest, reply: ESReply) {
   );
 }
 
-function execLC(
-  lc: Lifecycle,
+//LC
+async function errorHandling(
   app: Espresso,
   request: ESRequest,
   reply: ESReply,
+  error: Error,
 ) {
-  return lc(app, request, reply).catch((error) =>
-    app.errorHandler(error, request, reply)
+  await app.errorHandler(error, request, reply);
+  callHook(
+    "onError",
+    request,
+    reply,
+    app.hooks,
+    request.route?.hooks,
+    error,
   );
 }
 
-function execHook(
-  name: HookNames,
-  app: Espresso,
-  request: ESRequest,
-  reply: ESReply,
-) {
-  return callHook(name, request, reply, app.hooks, request.route?.hooks).catch((
-    error,
-  ) => app.errorHandler(error, request, reply));
-}
-
 export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
-  await execLC(routing, app, request, reply);
-  await execHook("onRequest", app, request, reply);
-  await execLC(parsing, app, request, reply);
-  await execHook("preValidation", app, request, reply);
-  await execLC(validating, app, request, reply);
-  await execHook("preHandler", app, request, reply);
-  await execLC(handling, app, request, reply);
-  await execHook("preSerialization", app, request, reply);
-  await execLC(serializing, app, request, reply);
+  try {
+    await routing(app, request, reply);
+    await parsing(app, request, reply);
+    await validating(app, request, reply);
+    await handling(app, request, reply);
+    await callHook(
+      "preSerialization",
+      request,
+      reply,
+      app.hooks,
+      request.route?.hooks,
+    );
+  } catch (error) {
+    await errorHandling(app, request, reply, error);
+  } finally {
+    await serializing(app, request, reply);
+  }
 }
