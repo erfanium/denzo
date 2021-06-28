@@ -1,7 +1,11 @@
 import { ESReply } from "./reply.ts";
 import { ESRequest } from "./request.ts";
 
-export type HookNames = "onRequest" | "preHandler";
+export type HookNames =
+  | "onRequest"
+  | "preHandler"
+  | "preValidation"
+  | "preSerialization";
 
 export interface Hook {
   (request: ESRequest, reply: ESReply): unknown;

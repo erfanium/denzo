@@ -1,11 +1,11 @@
 {
-   "deno.enable": true,
-   "deno.lint": true,
-   "deno.unstable": true,
-   "deno.suggest.imports.autoDiscover": true,
-   "deno.suggest.imports.hosts": {
-      "https://esm.sh": false,
-      "https://raw.githubusercontent.com": false,
-      "https://deno.land": false
-   }
+  "deno.enable": true,
+  "deno.lint": true,
+  "deno.unstable": true,
+  "deno.suggest.imports.autoDiscover": true,
+  "deno.suggest.imports.hosts": {
+    "https://esm.sh": false,
+    "https://raw.githubusercontent.com": false,
+    "https://deno.land": false
+  }
 }

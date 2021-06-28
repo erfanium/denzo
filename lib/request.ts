@@ -1,3 +1,4 @@
+import { HTTPMethods } from "./httpMethods.ts";
 import { findKey, getKey, Key, Meta, setKey } from "./keys.ts";
 import { Route } from "./route.ts";
 
@@ -10,27 +11,28 @@ export function paramsToObject(entries: URLSearchParams) {
 }
 
 export interface DefaultRequestTypes {
-  Params?: unknown
-  Body?: unknown
-  Query?: unknown
+  Params?: unknown;
+  Body?: unknown;
+  Query?: unknown;
 }
 export class ESRequest<T extends DefaultRequestTypes = DefaultRequestTypes> {
-  params: T['Params'];
-  query: T['Query'];
-  body: T['Body'];
+  params: T["Params"];
+  query: T["Query"];
+  body: T["Body"];
   route: Route | undefined;
   raw: Request;
   readonly headers: Headers;
   readonly url: URL;
   readonly path: string;
-  readonly method: string;
+  readonly method: HTTPMethods;
   meta: Meta = {};
 
   constructor(rawRequest: Request) {
     this.raw = rawRequest;
     const url = new URL(rawRequest.url);
     this.url = url, this.path = rawRequest.url, this;
-    this.method = rawRequest.method, this.params = {};
+    this.method = rawRequest.method as HTTPMethods; // todo
+    this.params = {};
     this.query = paramsToObject(url.searchParams);
     this.headers = rawRequest.headers, this.body = null;
   }
