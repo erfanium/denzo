@@ -7,6 +7,7 @@ export interface ErrorHandler {
 }
 
 export const defaultErrorHandler: ErrorHandler = (error, _, reply) => {
+  console.error(error);
   if (error instanceof ESError) {
     reply.code(error.statusCode).send({
       errorCode: error.errorCode,

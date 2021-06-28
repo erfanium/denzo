@@ -12,7 +12,7 @@ import { DefaultRouteTypes, Route, RouteInit } from "./lib/route.ts";
 import { addRoute, getRoutes, RouteTrees } from "./lib/router.ts";
 import { buildAjvSchemaCompiler, SchemaCompiler } from "./lib/schema.ts";
 import { defaultSerializer, ReplySerializer } from "./lib/serializer.ts";
-import { serve } from "./lib/server.ts";
+import { noop, serve } from "./lib/server.ts";
 
 export interface EspressoInit {
   root?: boolean;
@@ -61,10 +61,11 @@ export class Espresso {
     addRoute(this.routeTrees, route.method, route.finalUrl, route);
   }
 
-  handle({ request: rawRequest, respondWith }: Deno.RequestEvent) {
+  async handle({ request: rawRequest, respondWith }: Deno.RequestEvent) {
     const reply = new ESReply();
     const request = new ESRequest(rawRequest);
-    return start(this, request, reply).then(respondWith);
+    const response = await start(this, request, reply);
+    respondWith(response).catch(noop);
   }
 
   getRoutes() {

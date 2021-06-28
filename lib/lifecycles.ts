@@ -108,6 +108,20 @@ async function errorHandling(
   );
 }
 
+function serialize(
+  app: Espresso,
+  request: ESRequest,
+  reply: ESReply,
+): Response {
+  if (reply.body instanceof Response) return reply.body;
+
+  const serializedBody = app.serializer(request, reply);
+  return new Response(serializedBody, {
+    headers: reply.headers,
+    status: reply.statusCode,
+  });
+}
+
 export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
   try {
     await routing(app, request, reply);
@@ -125,10 +139,7 @@ export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
     await errorHandling(app, request, reply, error);
   }
 
-  const serializedBody = app.serializer(request, reply);
+  const response = serialize(app, request, reply);
   reply.responseTime = performance.now() - reply.createdAt;
-  return new Response(serializedBody, {
-    headers: reply.headers,
-    status: reply.statusCode,
-  });
+  return response;
 }
