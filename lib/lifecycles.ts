@@ -4,10 +4,6 @@ import { ESReply } from "./reply.ts";
 import { ESRequest } from "./request.ts";
 import { findRoute } from "./router.ts";
 
-interface Lifecycle {
-  (app: Espresso, request: ESRequest, reply: ESReply): Promise<void>;
-}
-
 // LC
 async function routing(app: Espresso, request: ESRequest, reply: ESReply) {
   const [route, params] = findRoute(
