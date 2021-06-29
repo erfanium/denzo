@@ -27,7 +27,7 @@ async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
     app.defaultContentType;
   const parser = app.contentTypeParsers.get(contentType);
   if (!parser) {
-    reply.code(400).send({
+    reply.status(400).send({
       errorCode: "BAD_CONTENT_TYPE",
       message: `No content type parser found for '${contentType}'`,
     });
@@ -59,7 +59,7 @@ async function validating(app: Espresso, request: ESRequest, reply: ESReply) {
     if (!validator) continue;
     const error = validator(request[key]);
     if (!error) continue;
-    reply.code(400).send({
+    reply.status(400).send({
       errorCode: "VALIDATION_ERROR",
       message: key + " " + error.message,
     });
@@ -82,7 +82,7 @@ async function handling(app: Espresso, request: ESRequest, reply: ESReply) {
   );
 
   if (!request.route) {
-    return reply.code(404).send();
+    return reply.status(404).send();
   }
 
   const body = await request.route.handler(request, reply);
@@ -141,5 +141,6 @@ export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
 
   const response = serialize(app, request, reply);
   reply.responseTime = performance.now() - reply.createdAt;
+  console.log(reply.responseTime);
   return response;
 }

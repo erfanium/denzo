@@ -9,14 +9,14 @@ export interface ErrorHandler {
 export const defaultErrorHandler: ErrorHandler = (error, _, reply) => {
   console.error(error);
   if (error instanceof ESError) {
-    reply.code(error.statusCode).send({
+    reply.status(error.statusCode).send({
       errorCode: error.errorCode,
       message: error.message,
     });
     return Promise.resolve();
   }
 
-  reply.code(500).send({
+  reply.status(500).send({
     errorCode: "INTERNAL_SERVER_ERROR",
     message: error?.message,
   });

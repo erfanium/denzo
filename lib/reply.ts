@@ -19,7 +19,7 @@ export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
     return this;
   }
 
-  code(s: number) {
+  status(s: number) {
     this.statusCode = s;
     return this;
   }
@@ -31,6 +31,6 @@ export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
   }
 
   redirect(url: string, statusCode = 302) {
-    this.header("location", url).code(statusCode).send();
+    this.header("location", url).status(statusCode).send();
   }
 }

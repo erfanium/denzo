@@ -10,7 +10,7 @@ const jsonCP: ContentTypeParser = async (request, reply) => {
     const body = await request.raw.json();
     return body;
   } catch (e) {
-    reply.code(400).send({ errorCode: "BAD_JSON", message: e.message }); // todo
+    reply.status(400).send({ errorCode: "BAD_JSON", message: e.message }); // todo
   }
 };
 
@@ -19,7 +19,7 @@ const textCP: ContentTypeParser = async (request, reply) => {
     const body = await request.raw.text();
     return body;
   } catch (e) {
-    reply.code(400).send({ errorCode: "BAD_BODY", message: e.message }); // todo
+    reply.status(400).send({ errorCode: "BAD_BODY", message: e.message }); // todo
   }
 };
 
