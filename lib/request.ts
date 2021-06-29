@@ -15,7 +15,7 @@ export interface DefaultRequestTypes {
   Body?: unknown;
   Query?: unknown;
 }
-export class ESRequest<T extends DefaultRequestTypes = DefaultRequestTypes> {
+export class DenzoRequest<T extends DefaultRequestTypes = DefaultRequestTypes> {
   params: T["Params"];
   query: T["Query"];
   body: T["Body"];

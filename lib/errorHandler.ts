@@ -1,9 +1,9 @@
 import { ESError } from "./errors.ts";
-import { ESReply } from "./reply.ts";
-import { ESRequest } from "./request.ts";
+import { DenzoReply } from "./reply.ts";
+import { DenzoRequest } from "./request.ts";
 
 export interface ErrorHandler {
-  (error: Error, request: ESRequest, reply: ESReply): Promise<void>;
+  (error: Error, request: DenzoRequest, reply: DenzoReply): Promise<void>;
 }
 
 export const defaultErrorHandler: ErrorHandler = (error, _, reply) => {

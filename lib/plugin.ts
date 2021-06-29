@@ -1,5 +1,5 @@
-import { Espresso } from "../espresso.ts";
+import { Denzo } from "../denzo.ts";
 
 export interface Plugin {
-  (app: Espresso): void;
+  (app: Denzo): void;
 }

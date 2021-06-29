@@ -1,6 +1,6 @@
-import { createKey, Espresso } from "../mod.ts";
+import { createKey, Denzo } from "../mod.ts";
 
-const app = new Espresso();
+const app = new Denzo();
 
 const userIdKey = createKey<number>("userId");
 const userLanguageKey = createKey<string>("userLanguage");

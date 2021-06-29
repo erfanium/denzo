@@ -6,7 +6,7 @@ export interface DefaultReplyTypes {
   Response?: unknown;
 }
 
-export class ESReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
+export class DenzoReply<T extends DefaultReplyTypes = DefaultReplyTypes> {
   sent = false;
   statusCode = 200;
   body: T["Response"] | undefined = undefined;

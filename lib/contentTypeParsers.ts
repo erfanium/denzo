@@ -1,8 +1,8 @@
-import { ESReply } from "./reply.ts";
-import { ESRequest } from "./request.ts";
+import { DenzoReply } from "./reply.ts";
+import { DenzoRequest } from "./request.ts";
 
 export interface ContentTypeParser {
-  (request: ESRequest, reply: ESReply): Promise<unknown>;
+  (request: DenzoRequest, reply: DenzoReply): Promise<unknown>;
 }
 
 const jsonCP: ContentTypeParser = async (request, reply) => {

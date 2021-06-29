@@ -1,5 +1,5 @@
-import { ESReply } from "./reply.ts";
-import { ESRequest } from "./request.ts";
+import { DenzoReply } from "./reply.ts";
+import { DenzoRequest } from "./request.ts";
 
 export type BasicHookNames =
   | "onRequest"
@@ -8,7 +8,7 @@ export type BasicHookNames =
   | "preSerialization";
 
 export interface Hook {
-  (request: ESRequest, reply: ESReply, error?: Error): unknown;
+  (request: DenzoRequest, reply: DenzoReply, error?: Error): unknown;
 }
 
 export type HookNames = BasicHookNames | "onError";
@@ -41,8 +41,8 @@ export function getHooks(
 
 export async function callHook(
   name: HookNames,
-  request: ESRequest,
-  reply: ESReply,
+  request: DenzoRequest,
+  reply: DenzoReply,
   appHooks: HookStorage,
   routeHooks?: HookStorage,
   error?: Error,

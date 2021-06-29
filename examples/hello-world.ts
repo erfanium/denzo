@@ -1,6 +1,6 @@
-import { Espresso } from "../mod.ts";
+import { Denzo } from "../mod.ts";
 
-const app = new Espresso();
+const app = new Denzo();
 
 interface RouteTypes {
   Response: {
@@ -10,9 +10,9 @@ interface RouteTypes {
 
 app.route<RouteTypes>({
   method: "GET",
-  url: "/google",
-  handler(_request, reply) {
-    reply.redirect("https://www.google.com");
+  url: "/hi",
+  handler() {
+    return { hello: "world!" };
   },
 });
 

@@ -1,8 +1,8 @@
-import { Espresso } from "../mod.ts";
+import { Denzo } from "../mod.ts";
 
-const app = new Espresso();
+const app = new Denzo();
 
-function users(app: Espresso) {
+function users(app: Denzo) {
   app.route({
     method: "GET",
     url: "/",
@@ -20,7 +20,7 @@ function users(app: Espresso) {
   });
 }
 
-function posts(app: Espresso) {
+function posts(app: Denzo) {
   app.route({
     method: "GET",
     url: "/",

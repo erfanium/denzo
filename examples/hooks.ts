@@ -1,6 +1,6 @@
-import { Espresso } from "../mod.ts";
+import { Denzo } from "../mod.ts";
 
-const app = new Espresso();
+const app = new Denzo();
 
 const delay = (t: number) => new Promise((resolve) => setTimeout(resolve, t));
 

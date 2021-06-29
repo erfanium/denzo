@@ -1,7 +1,7 @@
-import { ESRequest } from "./request.ts";
-import { ESReply } from "./reply.ts";
+import { DenzoRequest } from "./request.ts";
+import { DenzoReply } from "./reply.ts";
 import { ValidatorFunction } from "./schema.ts";
-import { Espresso } from "../espresso.ts";
+import { Denzo } from "../denzo.ts";
 import { Hook, HookStorage } from "./hooks.ts";
 import { HTTPMethods } from "./httpMethods.ts";
 
@@ -24,8 +24,8 @@ export interface RouteInit<T extends DefaultRouteTypes> {
     body?: Schema;
   };
   handler(
-    request: ESRequest<T>,
-    reply: ESReply<T>,
+    request: DenzoRequest<T>,
+    reply: DenzoReply<T>,
   ): T["Response"] | Promise<T["Response"]> | void | Promise<void>;
   onRequest?: Hook | Hook[];
   preHandler?: Hook | Hook[];
@@ -53,7 +53,7 @@ export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
   handler: RouteInit<T>["handler"];
   hooks: HookStorage = {};
 
-  constructor(app: Espresso, init: RouteInit<T>) {
+  constructor(app: Denzo, init: RouteInit<T>) {
     this.method = init.method;
     this.url = init.url;
     this.finalUrl = app.prefix + init.url;

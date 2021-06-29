@@ -1,7 +1,7 @@
-import { ESReply } from "./reply.ts";
-import { ESRequest } from "./request.ts";
+import { DenzoReply } from "./reply.ts";
+import { DenzoRequest } from "./request.ts";
 export interface ReplySerializer {
-  (request: ESRequest, reply: ESReply): BodyInit;
+  (request: DenzoRequest, reply: DenzoReply): BodyInit;
 }
 
 export const defaultSerializer: ReplySerializer = (_, reply) => {

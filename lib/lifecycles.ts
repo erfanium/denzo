@@ -1,11 +1,11 @@
-import { Espresso } from "../espresso.ts";
+import { Denzo } from "../denzo.ts";
 import { callHook, callHook as _callHook } from "./hooks.ts";
-import { ESReply } from "./reply.ts";
-import { ESRequest } from "./request.ts";
+import { DenzoReply } from "./reply.ts";
+import { DenzoRequest } from "./request.ts";
 import { findRoute } from "./router.ts";
 
 // LC
-async function routing(app: Espresso, request: ESRequest, reply: ESReply) {
+async function routing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
   const [route, params] = findRoute(
     app.routeTrees,
     request.method,
@@ -20,7 +20,7 @@ async function routing(app: Espresso, request: ESRequest, reply: ESReply) {
 }
 
 // LC
-async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
+async function parsing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
   if (reply.sent) return; // already sent
   if (request.method === "GET") return; // GET requests have no body
   const contentType = request.headers.get("content-type") ||
@@ -38,7 +38,7 @@ async function parsing(app: Espresso, request: ESRequest, reply: ESReply) {
 }
 
 // LC
-async function validating(app: Espresso, request: ESRequest, reply: ESReply) {
+async function validating(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
   if (reply.sent) return; // already sent
   if (!request.route) return;
 
@@ -70,7 +70,7 @@ async function validating(app: Espresso, request: ESRequest, reply: ESReply) {
 }
 
 // LC
-async function handling(app: Espresso, request: ESRequest, reply: ESReply) {
+async function handling(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
   if (reply.sent) return; // already sent
 
   await callHook(
@@ -92,9 +92,9 @@ async function handling(app: Espresso, request: ESRequest, reply: ESReply) {
 
 //LC
 async function errorHandling(
-  app: Espresso,
-  request: ESRequest,
-  reply: ESReply,
+  app: Denzo,
+  request: DenzoRequest,
+  reply: DenzoReply,
   error: Error,
 ) {
   await app.errorHandler(error, request, reply);
@@ -109,9 +109,9 @@ async function errorHandling(
 }
 
 function serialize(
-  app: Espresso,
-  request: ESRequest,
-  reply: ESReply,
+  app: Denzo,
+  request: DenzoRequest,
+  reply: DenzoReply,
 ): Response {
   if (reply.body instanceof Response) return reply.body;
 
@@ -122,7 +122,7 @@ function serialize(
   });
 }
 
-export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
+export async function start(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
   try {
     await routing(app, request, reply);
     await parsing(app, request, reply);

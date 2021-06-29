@@ -1,7 +1,7 @@
 import S from "https://esm.sh/fluent-json-schema@3.0.0";
-import { Espresso } from "../mod.ts";
+import { Denzo } from "../mod.ts";
 
-const app = new Espresso();
+const app = new Denzo();
 
 interface RouteTypes {
   Query: {

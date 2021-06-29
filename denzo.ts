@@ -6,15 +6,15 @@ import { defaultErrorHandler, ErrorHandler } from "./lib/errorHandler.ts";
 import { addHook, Hook, HookNames, HookStorage } from "./lib/hooks.ts";
 import { start } from "./lib/lifecycles.ts";
 import { Plugin } from "./lib/plugin.ts";
-import { ESReply } from "./lib/reply.ts";
-import { ESRequest } from "./lib/request.ts";
+import { DenzoReply } from "./lib/reply.ts";
+import { DenzoRequest } from "./lib/request.ts";
 import { DefaultRouteTypes, Route, RouteInit } from "./lib/route.ts";
 import { addRoute, getRoutes, RouteTrees } from "./lib/router.ts";
 import { buildAjvSchemaCompiler, SchemaCompiler } from "./lib/schema.ts";
 import { defaultSerializer, ReplySerializer } from "./lib/serializer.ts";
 import { noop, serve } from "./lib/server.ts";
 
-export interface EspressoInit {
+export interface DenzoInit {
   root?: boolean;
   prefix?: string;
   routeTrees?: RouteTrees;
@@ -28,7 +28,7 @@ export interface RegisterOptions {
   prefix?: string;
 }
 
-export class Espresso {
+export class Denzo {
   contentTypeParsers: ContentTypeParsers;
   defaultContentType: string;
   schemaCompiler: SchemaCompiler;
@@ -39,7 +39,7 @@ export class Espresso {
   readonly routeTrees: RouteTrees;
   readonly hooks: HookStorage = {};
 
-  constructor(init: EspressoInit = {}) {
+  constructor(init: DenzoInit = {}) {
     this.root = init.root === undefined ? true : init.root;
     this.prefix = init.prefix || "";
     this.routeTrees = init.routeTrees || {};
@@ -62,8 +62,8 @@ export class Espresso {
   }
 
   async handle({ request: rawRequest, respondWith }: Deno.RequestEvent) {
-    const reply = new ESReply();
-    const request = new ESRequest(rawRequest);
+    const reply = new DenzoReply();
+    const request = new DenzoRequest(rawRequest);
     const response = await start(this, request, reply);
     respondWith(response).catch(noop);
   }
@@ -73,7 +73,7 @@ export class Espresso {
   }
 
   register(plugin: Plugin, registerOpts: RegisterOptions = {}) {
-    const newScope = new Espresso({
+    const newScope = new Denzo({
       root: false,
       prefix: registerOpts.prefix,
       routeTrees: this.routeTrees,

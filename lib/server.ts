@@ -1,8 +1,8 @@
-import { Espresso } from "../espresso.ts";
+import { Denzo } from "../denzo.ts";
 
 export const noop = (_: unknown) => undefined;
 
-async function handleConn(app: Espresso, conn: Deno.Conn) {
+async function handleConn(app: Denzo, conn: Deno.Conn) {
   for await (const requestEvent of Deno.serveHttp(conn)) {
     app
       .handle(requestEvent)
@@ -14,7 +14,7 @@ async function handleConn(app: Espresso, conn: Deno.Conn) {
   }
 }
 
-export async function serve(app: Espresso, listener: Deno.Listener) {
+export async function serve(app: Denzo, listener: Deno.Listener) {
   for await (const conn of listener) {
     handleConn(app, conn).catch(noop);
   }
