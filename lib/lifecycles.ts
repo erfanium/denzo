@@ -141,6 +141,5 @@ export async function start(app: Espresso, request: ESRequest, reply: ESReply) {
 
   const response = serialize(app, request, reply);
   reply.responseTime = performance.now() - reply.createdAt;
-  console.log(reply.responseTime);
   return response;
 }
