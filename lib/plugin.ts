@@ -1,5 +1,5 @@
 import { Denzo } from "../denzo.ts";
 
-export interface Plugin {
-  (app: Denzo): void;
+export interface PluginBuilder {
+  (context: Denzo): void;
 }

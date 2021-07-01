@@ -3,13 +3,13 @@ import {
   defaultParsers,
 } from "./lib/contentTypeParsers.ts";
 import { defaultErrorHandler, ErrorHandler } from "./lib/errorHandler.ts";
-import { addHook, Hook, HookNames, HookStorage } from "./lib/hooks.ts";
+import { addHook, Hook, HookNames, Hooks } from "./lib/hooks.ts";
 import { start } from "./lib/lifecycles.ts";
-import { Plugin } from "./lib/plugin.ts";
+import { PluginBuilder } from "./lib/plugin.ts";
 import { DenzoReply } from "./lib/reply.ts";
 import { DenzoRequest } from "./lib/request.ts";
 import { DefaultRouteTypes, Route, RouteInit } from "./lib/route.ts";
-import { addRoutes, getRoutes, RouteTrees } from "./lib/router.ts";
+import { buildTrees, RouteTrees } from "./lib/router.ts";
 import { buildAjvSchemaCompiler, SchemaCompiler } from "./lib/schema.ts";
 import { defaultSerializer, ReplySerializer } from "./lib/serializer.ts";
 import { noop, serve } from "./lib/server.ts";
@@ -17,7 +17,6 @@ import { noop, serve } from "./lib/server.ts";
 export interface DenzoInit {
   root?: boolean;
   prefix?: string;
-  routeTrees?: RouteTrees;
   contentTypeParsers?: ContentTypeParsers;
   schemaCompiler?: SchemaCompiler;
   serializer?: ReplySerializer;
@@ -28,21 +27,30 @@ export interface RegisterOptions {
   prefix?: string;
 }
 
+export interface Plugin {
+  prefix: string;
+  context: Denzo;
+}
+
 export class Denzo {
   contentTypeParsers: ContentTypeParsers;
   defaultContentType: string;
   schemaCompiler: SchemaCompiler;
   serializer: ReplySerializer;
   errorHandler: ErrorHandler;
-  readonly root: boolean;
-  readonly prefix: string;
-  readonly routeTrees: RouteTrees;
-  readonly hooks: HookStorage = {};
+  routeTrees: RouteTrees | null;
+  readonly name: string;
+  readonly routes: Route[];
+  readonly plugins: Plugin[];
+  readonly hooks: Hooks = {};
+  protected ready: boolean;
 
   constructor(init: DenzoInit = {}) {
-    this.root = init.root === undefined ? true : init.root;
-    this.prefix = init.prefix || "";
-    this.routeTrees = init.routeTrees || {};
+    this.name = "root";
+    this.ready = false;
+    this.routes = [];
+    this.plugins = [];
+    this.routeTrees = null;
     this.contentTypeParsers = init.contentTypeParsers || defaultParsers;
     this.defaultContentType = "text/plain";
     this.schemaCompiler = init.schemaCompiler || buildAjvSchemaCompiler();
@@ -50,43 +58,52 @@ export class Denzo {
     this.errorHandler = init.errorHandler || defaultErrorHandler;
   }
 
-  serve(listener: Deno.Listener) {
-    serve(this, listener);
-  }
-
   route<T extends DefaultRouteTypes = DefaultRouteTypes>(
     routeInit: RouteInit<T>,
   ) {
     const route = new Route(this, routeInit);
-    addRoutes(this.routeTrees, route.methods, route.finalUrl, route);
+    this.routes.push(route);
   }
 
-  async handle({ request: rawRequest, respondWith }: Deno.RequestEvent) {
-    const reply = new DenzoReply();
-    const request = new DenzoRequest(rawRequest);
-    const response = await start(this, request, reply);
-    respondWith(response).catch(noop);
-  }
-
-  getRoutes() {
-    return getRoutes(this.routeTrees);
-  }
-
-  register(plugin: Plugin, registerOpts: RegisterOptions = { prefix: "" }) {
-    const newScope = new Denzo({
-      root: false,
-      prefix: this.prefix + registerOpts.prefix,
-      routeTrees: this.routeTrees,
+  register(
+    pluginBuilder: PluginBuilder,
+    { prefix }: RegisterOptions,
+  ) {
+    const context = new Denzo({
       contentTypeParsers: this.contentTypeParsers,
       schemaCompiler: this.schemaCompiler,
       serializer: this.serializer,
       errorHandler: this.errorHandler,
     });
 
-    plugin(newScope);
+    pluginBuilder(context);
+    this.plugins.push({ prefix: prefix || "", context });
   }
 
   addHook(name: HookNames, hook: Hook) {
     addHook(this.hooks, name, hook);
+  }
+
+  finalize() {
+    if (this.ready) return; // todo throw Error
+    this.routeTrees = buildTrees(this);
+    this.ready = true;
+  }
+
+  serve(listener: Deno.Listener) {
+    if (!this.ready) this.finalize();
+
+    serve(this, listener);
+  }
+
+  async handle({ request: rawRequest, respondWith }: Deno.RequestEvent) {
+    if (!this.ready) {
+      throw new Error("App is not ready! call app.finalize() first");
+    }
+
+    const reply = new DenzoReply();
+    const request = new DenzoRequest(rawRequest);
+    const response = await start(this, request, reply);
+    respondWith(response).catch(noop);
   }
 }

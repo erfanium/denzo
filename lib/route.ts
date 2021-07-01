@@ -2,7 +2,7 @@ import { DenzoRequest } from "./request.ts";
 import { DenzoReply } from "./reply.ts";
 import { ValidatorFunction } from "./schema.ts";
 import { Denzo } from "../denzo.ts";
-import { Hook, HookStorage } from "./hooks.ts";
+import { Hook, Hooks } from "./hooks.ts";
 import { HTTPMethods } from "./httpMethods.ts";
 
 // deno-lint-ignore ban-types
@@ -17,7 +17,7 @@ export interface DefaultRouteTypes {
 
 export interface RouteInit<T extends DefaultRouteTypes> {
   method: HTTPMethods | HTTPMethods[];
-  url: string;
+  url: string | string[];
   schema?: {
     params?: Schema;
     query?: Schema;
@@ -38,8 +38,7 @@ function toArray<T>(i: T | T[]): T[] {
 
 export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
   methods: HTTPMethods[];
-  url: string;
-  finalUrl: string;
+  urls: string[];
   schema?: {
     params?: Schema;
     query?: Schema;
@@ -51,12 +50,11 @@ export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
     body?: ValidatorFunction;
   };
   handler: RouteInit<T>["handler"];
-  hooks: HookStorage = {};
+  hooks: Hooks = {};
 
   constructor(app: Denzo, init: RouteInit<T>) {
     this.methods = toArray(init.method);
-    this.url = init.url;
-    this.finalUrl = app.prefix + init.url;
+    this.urls = toArray(init.url);
     this.handler = init.handler;
     this.schema = init.schema;
 
