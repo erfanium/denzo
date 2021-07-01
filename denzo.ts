@@ -72,10 +72,10 @@ export class Denzo {
     return getRoutes(this.routeTrees);
   }
 
-  register(plugin: Plugin, registerOpts: RegisterOptions = {}) {
+  register(plugin: Plugin, registerOpts: RegisterOptions = { prefix: "" }) {
     const newScope = new Denzo({
       root: false,
-      prefix: registerOpts.prefix,
+      prefix: this.prefix + registerOpts.prefix,
       routeTrees: this.routeTrees,
       contentTypeParsers: this.contentTypeParsers,
       schemaCompiler: this.schemaCompiler,
