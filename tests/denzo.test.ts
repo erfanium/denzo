@@ -27,7 +27,6 @@ test("[denzo] nested plugins prefix", () => {
     a.register((a2) => {
       a2.route({ method: "GET", url: "/bar", handler() {} });
     }, { prefix: "/b" });
-
   }, { prefix: "/a" });
 
   const routes = app.getRoutes();
