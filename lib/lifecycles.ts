@@ -38,7 +38,11 @@ async function parsing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
 }
 
 // LC
-async function validating(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
+async function validating(
+  app: Denzo,
+  request: DenzoRequest,
+  reply: DenzoReply,
+) {
   if (reply.sent) return; // already sent
   if (!request.route) return;
 
@@ -122,7 +126,11 @@ function serialize(
   });
 }
 
-export async function start(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
+export async function start(
+  app: Denzo,
+  request: DenzoRequest,
+  reply: DenzoReply,
+) {
   try {
     await routing(app, request, reply);
     await parsing(app, request, reply);
