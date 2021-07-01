@@ -16,7 +16,7 @@ export interface DefaultRouteTypes {
 }
 
 export interface RouteInit<T extends DefaultRouteTypes> {
-  method: HTTPMethods;
+  method: HTTPMethods | HTTPMethods[];
   url: string;
   schema?: {
     params?: Schema;
@@ -37,7 +37,7 @@ function toArray<T>(i: T | T[]): T[] {
 }
 
 export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
-  method: HTTPMethods;
+  method: HTTPMethods | HTTPMethods[];
   url: string;
   finalUrl: string;
   schema?: {
