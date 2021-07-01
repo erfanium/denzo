@@ -9,7 +9,7 @@ interface RouteTypes {
 }
 
 app.route<RouteTypes>({
-  method: "GET",
+  methods: "GET",
   url: "/hi",
   handler() {
     return { hello: "world!" };
@@ -19,7 +19,7 @@ app.route<RouteTypes>({
 const listener = Deno.listen({ port: 3000 });
 app.serve(listener);
 
-console.log("On port 3030");
+console.log("On port 3000");
 app.getRoutes().forEach((route, path) =>
-  console.log(`${route.method} ${path}`)
+  console.log(`${route.methods} ${path}`)
 );
