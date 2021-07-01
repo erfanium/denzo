@@ -16,7 +16,7 @@ export interface DefaultRouteTypes {
 }
 
 export interface RouteInit<T extends DefaultRouteTypes> {
-  methods: HTTPMethods | HTTPMethods[];
+  method: HTTPMethods | HTTPMethods[];
   url: string;
   schema?: {
     params?: Schema;
@@ -54,7 +54,7 @@ export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
   hooks: HookStorage = {};
 
   constructor(app: Denzo, init: RouteInit<T>) {
-    this.methods = toArray(init.methods);
+    this.methods = toArray(init.method);
     this.url = init.url;
     this.finalUrl = app.prefix + init.url;
     this.handler = init.handler;

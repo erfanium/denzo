@@ -9,7 +9,7 @@ interface RouteTypes {
 }
 
 app.route<RouteTypes>({
-  methods: "GET",
+  method: "GET",
   url: "/hi",
   handler() {
     return { hello: "world!" };

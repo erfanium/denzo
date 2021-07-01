@@ -6,11 +6,11 @@ const { test } = Deno;
 test("[denzo] plugins prefix", () => {
   const app = new Denzo();
   app.register((a) => {
-    a.route({ methods: "GET", url: "/foo", handler() {} });
+    a.route({ method: "GET", url: "/foo", handler() {} });
   }, { prefix: "/a" });
 
   app.register((a) => {
-    a.route({ methods: "GET", url: "/bar", handler() {} });
+    a.route({ method: "GET", url: "/bar", handler() {} });
   }, { prefix: "/b" });
 
   const routes = app.getRoutes();
@@ -22,10 +22,10 @@ test("[denzo] plugins prefix", () => {
 test("[denzo] nested plugins prefix", () => {
   const app = new Denzo();
   app.register((a) => {
-    a.route({ methods: "GET", url: "/foo", handler() {} });
+    a.route({ method: "GET", url: "/foo", handler() {} });
 
     a.register((a2) => {
-      a2.route({ methods: "GET", url: "/bar", handler() {} });
+      a2.route({ method: "GET", url: "/bar", handler() {} });
     }, { prefix: "/b" });
   }, { prefix: "/a" });
 

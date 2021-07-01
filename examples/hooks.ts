@@ -48,5 +48,5 @@ app.serve(listener);
 
 console.log("On port 3030");
 app.getRoutes().forEach((route, path) =>
-  console.log(`${route.method} ${path}`)
+  console.log(`${route.methods} ${path}`)
 );
