@@ -19,10 +19,10 @@ app.route<RouteTypes>({
 
 const inject = createInject(app);
 
-const response = await inject('/hi');
+const response = await inject("/hi");
 const body = await response.json();
 
 console.log({
   response,
   body,
-})
+});
