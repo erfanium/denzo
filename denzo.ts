@@ -9,7 +9,7 @@ import { Plugin } from "./lib/plugin.ts";
 import { DenzoReply } from "./lib/reply.ts";
 import { DenzoRequest } from "./lib/request.ts";
 import { DefaultRouteTypes, Route, RouteInit } from "./lib/route.ts";
-import { addRoute, getRoutes, RouteTrees } from "./lib/router.ts";
+import { addRoutes, getRoutes, RouteTrees } from "./lib/router.ts";
 import { buildAjvSchemaCompiler, SchemaCompiler } from "./lib/schema.ts";
 import { defaultSerializer, ReplySerializer } from "./lib/serializer.ts";
 import { noop, serve } from "./lib/server.ts";
@@ -58,7 +58,7 @@ export class Denzo {
     routeInit: RouteInit<T>,
   ) {
     const route = new Route(this, routeInit);
-    addRoute(this.routeTrees, route.method, route.finalUrl, route);
+    addRoutes(this.routeTrees, route.methods, route.finalUrl, route);
   }
 
   async handle({ request: rawRequest, respondWith }: Deno.RequestEvent) {

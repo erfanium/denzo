@@ -14,9 +14,9 @@ function hasTrailingSlash(str: string): boolean {
 
 export type RouteTrees = Record<string, Node<Route>>;
 
-export function addRoute(
+export function addRoutes(
   routeTrees: RouteTrees,
-  method: HTTPMethods | HTTPMethods[],
+  methods: HTTPMethods[],
   path: string,
   route: Route,
 ): void {
@@ -37,11 +37,7 @@ export function addRoute(
     root.add(path, route);
   };
 
-  if (Array.isArray(method)) {
-    method.forEach(addToRouteTrees);
-    return;
-  }
-  addToRouteTrees(method as HTTPMethods);
+  methods.forEach(addToRouteTrees);
 }
 
 export function findRoute(
