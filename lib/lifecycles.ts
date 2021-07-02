@@ -7,7 +7,7 @@ import { findRoute } from "./router.ts";
 // LC
 async function routing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
   const [route, params] = findRoute(
-    app.routeTrees,
+    app.routeTrees!,
     request.method,
     request.url.pathname,
   );

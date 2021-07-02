@@ -13,12 +13,12 @@ export interface Hook {
 
 export type HookNames = BasicHookNames | "onError";
 
-export type HookStorage = {
+export type Hooks = {
   [key in HookNames]?: Hook[];
 };
 
 export function addHook(
-  storage: HookStorage,
+  storage: Hooks,
   name: HookNames,
   hook: Hook,
 ): void {
@@ -32,7 +32,7 @@ export function addHook(
 }
 
 export function getHooks(
-  storage: HookStorage,
+  storage: Hooks,
   name: HookNames,
 ): Hook[] {
   if (storage[name]) return storage[name]!;
@@ -43,8 +43,8 @@ export async function callHook(
   name: HookNames,
   request: DenzoRequest,
   reply: DenzoReply,
-  appHooks: HookStorage,
-  routeHooks?: HookStorage,
+  appHooks: Hooks,
+  routeHooks?: Hooks,
   error?: Error,
 ) {
   const hooksFromApp = getHooks(appHooks, name);

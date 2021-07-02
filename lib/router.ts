@@ -1,8 +1,15 @@
+import { Denzo } from "../denzo.ts";
 import { Node } from "../deps.ts";
 import { HTTPMethods } from "./httpMethods.ts";
 import { Route } from "./route.ts";
 
 type Params = Record<string, string>;
+
+type PartialRecord<K extends string, T> = {
+  [P in K]?: T;
+};
+
+export type RouteTrees = PartialRecord<HTTPMethods, Node<Route>>;
 
 function hasTrailingSlash(str: string): boolean {
   if (str.length > 1 && str[str.length - 1] === "/") {
@@ -12,32 +19,50 @@ function hasTrailingSlash(str: string): boolean {
   return false;
 }
 
-export type RouteTrees = Record<string, Node<Route>>;
-
-export function addRoutes(
+function add(
   routeTrees: RouteTrees,
-  methods: HTTPMethods[],
+  method: HTTPMethods,
   path: string,
   route: Route,
 ): void {
   if (path[0] !== "/") {
-    path = `/${path}`;
+    throw new Error(`path should starts with slash, but received '${path}'.`);
   }
 
   if (hasTrailingSlash(path)) {
     path = path.slice(0, path.length - 1);
   }
 
-  const addToRouteTrees = (methodItem: HTTPMethods) => {
-    let root = routeTrees[methodItem];
-    if (!root) {
-      root = new Node();
-      routeTrees[methodItem] = root;
-    }
-    root.add(path, route);
-  };
+  let root = routeTrees[method];
+  if (!root) {
+    root = new Node();
+    routeTrees[method] = root;
+  }
+  root.add(path, route);
+}
 
-  methods.forEach(addToRouteTrees);
+function addRoute(
+  routeTrees: RouteTrees,
+  prefix: string,
+  route: Route,
+): void {
+  const paths = route.urls.map((url) => prefix + url);
+  route.methods.forEach((method) =>
+    paths.forEach((path) => add(routeTrees, method, path, route))
+  );
+}
+
+export function buildTrees(root: Denzo): RouteTrees {
+  const trees: RouteTrees = {};
+  function addPluginRoutes(a: Denzo, prefix: string) {
+    a.routes.forEach((r) => addRoute(trees, prefix, r));
+    a.plugins.forEach((plugin) =>
+      addPluginRoutes(plugin.context, prefix + plugin.prefix)
+    );
+  }
+
+  addPluginRoutes(root, "");
+  return trees;
 }
 
 export function findRoute(
@@ -59,24 +84,4 @@ export function findRoute(
   if (paramsMap) params = Object.fromEntries(paramsMap);
 
   return [handle, params!];
-}
-
-function readNode(node: Node<Route>, routes: Map<string, Route>, prefix = "") {
-  if (node.handler) routes.set(prefix + node.path, node.handler);
-  node.children.forEach((child) => {
-    readNode(child, routes, prefix + node.path);
-  });
-
-  return routes;
-}
-
-export function getRoutes(routeTrees: RouteTrees): Map<string, Route> {
-  const routes: Map<string, Route> = new Map();
-  for (const method in routeTrees) {
-    readNode(routeTrees[method], routes).forEach((route, path) => {
-      routes.set(path, route);
-    });
-  }
-
-  return routes;
 }
