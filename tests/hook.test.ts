@@ -1,6 +1,7 @@
 import { assertEquals } from "./deps.ts";
 import { createInject } from "../utils/mod.ts";
 import { Denzo } from "../denzo.ts";
+import { createPlugin } from "../mod.ts";
 
 const { test } = Deno;
 
@@ -132,26 +133,14 @@ test("[hook] plugin encapsulation", async () => {
     order.push("root-onRequest");
   });
 
-  root.register((level1) => {
-    level1.addHook("onRequest", () => {
+  const level1 = createPlugin("l1", (denzo) => {
+    denzo.addHook("onRequest", () => {
       order.push("plugin-onRequest");
     });
 
-    level1.register((level2) => {
-      level2.addHook("onRequest", () => {
-        order.push("plugin2-onRequest");
-      });
+    denzo.register(level2);
 
-      level2.route({
-        method: "GET",
-        url: "/plugin2",
-        handler() {
-          return { from: "plugin2" };
-        },
-      });
-    });
-
-    level1.route({
+    denzo.route({
       method: "GET",
       url: "/plugin",
       handler() {
@@ -159,6 +148,22 @@ test("[hook] plugin encapsulation", async () => {
       },
     });
   });
+
+  const level2 = createPlugin("l2", (denzo) => {
+    denzo.addHook("onRequest", () => {
+      order.push("plugin2-onRequest");
+    });
+
+    denzo.route({
+      method: "GET",
+      url: "/plugin2",
+      handler() {
+        return { from: "plugin2" };
+      },
+    });
+  });
+
+  root.register(level1);
 
   root.route({
     method: "GET",

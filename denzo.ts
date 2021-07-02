@@ -85,7 +85,7 @@ export class Denzo {
       errorHandler: this.errorHandler,
     });
 
-    pluginBuilder(context);
+    pluginBuilder.fn(context);
     this.plugins.push({ prefix: prefix || "", context });
   }
 
