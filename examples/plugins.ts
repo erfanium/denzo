@@ -1,9 +1,9 @@
-import { Denzo } from "../mod.ts";
+import { createPlugin, Denzo } from "../mod.ts";
 import { printRoutes } from "../utils/mod.ts";
 
 const app = new Denzo();
 
-function users(app: Denzo) {
+const users = createPlugin("users", () => {
   app.route({
     method: "GET",
     url: "/",
@@ -19,9 +19,9 @@ function users(app: Denzo) {
       return "login";
     },
   });
-}
+});
 
-function posts(app: Denzo) {
+const posts = createPlugin("posts", (app: Denzo) => {
   app.route({
     method: "GET",
     url: "/",
@@ -29,7 +29,7 @@ function posts(app: Denzo) {
       return "Get all posts";
     },
   });
-}
+});
 
 app.register(users, { prefix: "/users" });
 app.register(posts, { prefix: "/posts" });

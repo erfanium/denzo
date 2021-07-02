@@ -1,19 +1,22 @@
 import { Denzo } from "../denzo.ts";
 import { findRoute } from "../lib/router.ts";
+import { createPlugin } from "../mod.ts";
 import { assert } from "./deps.ts";
 
 const { test } = Deno;
 
 test("[router] plugins prefix", () => {
   const app = new Denzo();
-  app.register((a) => {
-    a.route({ method: "GET", url: "/foo", handler() {} });
-  }, { prefix: "/a" });
+  const a = createPlugin("a", (denzo) => {
+    denzo.route({ method: "GET", url: "/foo", handler() {} });
+  });
 
-  app.register((a) => {
-    a.route({ method: "GET", url: "/bar", handler() {} });
-  }, { prefix: "/b" });
+  const b = createPlugin("b", (denzo) => {
+    denzo.route({ method: "GET", url: "/bar", handler() {} });
+  });
 
+  app.register(a, { prefix: "/a" });
+  app.register(b, { prefix: "/b" });
   app.finalize();
 
   assert(findRoute(app.routeTrees!, "GET", "/a/foo")[0]);
@@ -23,14 +26,16 @@ test("[router] plugins prefix", () => {
 
 test("[router] nested plugins prefix", () => {
   const app = new Denzo();
-  app.register((a) => {
-    a.route({ method: "GET", url: "/foo", handler() {} });
+  const a = createPlugin("a", (denzo) => {
+    denzo.route({ method: "GET", url: "/foo", handler() {} });
+    denzo.register(b, { prefix: "/b" });
+  });
 
-    a.register((a2) => {
-      a2.route({ method: "GET", url: "/bar", handler() {} });
-    }, { prefix: "/b" });
-  }, { prefix: "/a" });
+  const b = createPlugin("b", (denzo) => {
+    denzo.route({ method: "GET", url: "/bar", handler() {} });
+  });
 
+  app.register(a, { prefix: "/a" });
   app.finalize();
   assert(findRoute(app.routeTrees!, "GET", "/a/foo")[0]);
   assert(findRoute(app.routeTrees!, "GET", "/a/b/bar")[0]);
