@@ -51,6 +51,7 @@ export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
   };
   handler: RouteInit<T>["handler"];
   hooks: Hooks = {};
+  is404 = false;
 
   constructor(app: Denzo, init: RouteInit<T>) {
     this.methods = toArray(init.method);

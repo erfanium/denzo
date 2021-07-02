@@ -1,4 +1,4 @@
-import { assertEquals } from "../test_deps.ts";
+import { assertEquals } from "./deps.ts";
 import { createInject } from "../utils/mod.ts";
 
 const { test } = Deno;

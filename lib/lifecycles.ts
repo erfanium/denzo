@@ -13,9 +13,9 @@ async function routing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
   );
 
   request.params = params;
-  request.route = route;
+  request.route = route || app.fourOhFourRoute;
 
-  await callHook("onRequest", request, reply, app.hooks, request.route?.hooks);
+  await callHook("onRequest", request, reply, request.route.hooks);
   return;
 }
 
@@ -23,6 +23,8 @@ async function routing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
 async function parsing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
   if (reply.sent) return; // already sent
   if (request.method === "GET") return; // GET requests have no body
+  if (request.route.is404) return;
+
   const contentType = request.headers.get("content-type") ||
     app.defaultContentType;
   const parser = app.contentTypeParsers.get(contentType);
@@ -39,19 +41,18 @@ async function parsing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
 
 // LC
 async function validating(
-  app: Denzo,
+  _app: Denzo,
   request: DenzoRequest,
   reply: DenzoReply,
 ) {
   if (reply.sent) return; // already sent
-  if (!request.route) return;
+  if (request.route.is404) return;
 
   await callHook(
     "preValidation",
     request,
     reply,
-    app.hooks,
-    request.route?.hooks,
+    request.route.hooks,
   );
 
   const validators = request.route.validators;
@@ -74,18 +75,17 @@ async function validating(
 }
 
 // LC
-async function handling(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
+async function handling(_app: Denzo, request: DenzoRequest, reply: DenzoReply) {
   if (reply.sent) return; // already sent
 
   await callHook(
     "preHandler",
     request,
     reply,
-    app.hooks,
-    request.route?.hooks,
+    request.route.hooks,
   );
 
-  if (!request.route) {
+  if (request.route.is404) {
     return reply.status(404).send();
   }
 
@@ -106,8 +106,7 @@ async function errorHandling(
     "onError",
     request,
     reply,
-    app.hooks,
-    request.route?.hooks,
+    request.route.hooks,
     error,
   );
 }
@@ -140,8 +139,7 @@ export async function start(
       "preSerialization",
       request,
       reply,
-      app.hooks,
-      request.route?.hooks,
+      request.route.hooks,
     );
   } catch (error) {
     await errorHandling(app, request, reply, error);

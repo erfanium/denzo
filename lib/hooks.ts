@@ -1,3 +1,4 @@
+import { Denzo } from "../denzo.ts";
 import { DenzoReply } from "./reply.ts";
 import { DenzoRequest } from "./request.ts";
 
@@ -43,20 +44,37 @@ export async function callHook(
   name: HookNames,
   request: DenzoRequest,
   reply: DenzoReply,
-  appHooks: Hooks,
-  routeHooks?: Hooks,
+  hooks: Hooks = {},
   error?: Error,
 ) {
-  const hooksFromApp = getHooks(appHooks, name);
+  const hooksFromApp = getHooks(hooks, name);
   for (let i = 0; i < hooksFromApp.length; i++) {
     const hook = hooksFromApp[i];
     await hook(request, reply, error);
   }
+}
 
-  if (!routeHooks) return;
-  const hooksFromRoute = getHooks(routeHooks, name);
-  for (let i = 0; i < hooksFromRoute.length; i++) {
-    const hook = hooksFromRoute[i];
-    await hook(request, reply, error);
+function mergeHooks(lowLevelHooks: Hooks, topLevelHooks: Hooks) {
+  for (const _key in topLevelHooks) {
+    const key = _key as HookNames;
+    const lowLevelHookArray = lowLevelHooks[key];
+    lowLevelHooks[key] = [];
+    topLevelHooks[key]?.forEach((hook) => addHook(lowLevelHooks, key, hook));
+    lowLevelHookArray?.forEach((hook) => addHook(lowLevelHooks, key, hook));
   }
+}
+
+export function finalizeHooks(root: Denzo) {
+  function finalizeContextHooks(thisContext: Denzo) {
+    thisContext.routes.forEach((route) => {
+      mergeHooks(route.hooks, thisContext.hooks);
+    });
+
+    thisContext.plugins.forEach((plugin) => {
+      mergeHooks(plugin.context.hooks, thisContext.hooks);
+      finalizeContextHooks(plugin.context);
+    });
+  }
+
+  finalizeContextHooks(root);
 }
