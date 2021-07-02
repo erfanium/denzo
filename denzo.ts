@@ -3,7 +3,8 @@ import {
   defaultParsers,
 } from "./lib/contentTypeParsers.ts";
 import { defaultErrorHandler, ErrorHandler } from "./lib/errorHandler.ts";
-import { addHook, Hook, HookNames, Hooks } from "./lib/hooks.ts";
+import { FourOhFourRoute } from "./lib/fourOhFour.ts";
+import { addHook, finalizeHooks, Hook, HookNames, Hooks } from "./lib/hooks.ts";
 import { start } from "./lib/lifecycles.ts";
 import { PluginBuilder } from "./lib/plugin.ts";
 import { DenzoReply } from "./lib/reply.ts";
@@ -39,10 +40,11 @@ export class Denzo {
   serializer: ReplySerializer;
   errorHandler: ErrorHandler;
   routeTrees: RouteTrees | null;
+  fourOhFourRoute: FourOhFourRoute;
   readonly name: string;
   readonly routes: Route[];
   readonly plugins: Plugin[];
-  readonly hooks: Hooks = {};
+  readonly hooks: Hooks;
   protected ready: boolean;
 
   constructor(init: DenzoInit = {}) {
@@ -51,6 +53,13 @@ export class Denzo {
     this.routes = [];
     this.plugins = [];
     this.routeTrees = null;
+    this.hooks = {};
+    this.fourOhFourRoute = {
+      hooks: this.hooks,
+      validators: {},
+      is404: true,
+    };
+
     this.contentTypeParsers = init.contentTypeParsers || defaultParsers;
     this.defaultContentType = "text/plain";
     this.schemaCompiler = init.schemaCompiler || buildAjvSchemaCompiler();
@@ -67,7 +76,7 @@ export class Denzo {
 
   register(
     pluginBuilder: PluginBuilder,
-    { prefix }: RegisterOptions,
+    { prefix }: RegisterOptions = {},
   ) {
     const context = new Denzo({
       contentTypeParsers: this.contentTypeParsers,
@@ -87,6 +96,7 @@ export class Denzo {
   finalize() {
     if (this.ready) return; // todo throw Error
     this.routeTrees = buildTrees(this);
+    finalizeHooks(this);
     this.ready = true;
   }
 

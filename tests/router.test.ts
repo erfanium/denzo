@@ -1,6 +1,6 @@
 import { Denzo } from "../denzo.ts";
 import { findRoute } from "../lib/router.ts";
-import { assert } from "../test_deps.ts";
+import { assert } from "./deps.ts";
 
 const { test } = Deno;
 

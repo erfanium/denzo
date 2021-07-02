@@ -1,3 +1,4 @@
+import { FourOhFourRoute } from "./fourOhFour.ts";
 import { HTTPMethods } from "./httpMethods.ts";
 import { findKey, getKey, Key, Meta, setKey } from "./keys.ts";
 import { Route } from "./route.ts";
@@ -19,7 +20,7 @@ export class DenzoRequest<T extends DefaultRequestTypes = DefaultRequestTypes> {
   params: T["Params"];
   query: T["Query"];
   body: T["Body"];
-  route: Route | undefined;
+  route!: Route | FourOhFourRoute;
   raw: Request;
   readonly headers: Headers;
   readonly url: URL;

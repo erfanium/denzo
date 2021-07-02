@@ -10,7 +10,7 @@ export type MockedRespondWith = [
   () => Response | Promise<Response> | undefined,
 ];
 
-export interface InjectHandler {
+interface InjectHandler {
   handle(re: Deno.RequestEvent): Promise<void>;
 }
 
