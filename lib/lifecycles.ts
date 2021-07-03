@@ -1,4 +1,5 @@
 import { Denzo } from "../denzo.ts";
+import { findContentParser } from "./contentTypeParsers.ts";
 import { callHook, callHook as _callHook } from "./hooks.ts";
 import { DenzoReply } from "./reply.ts";
 import { DenzoRequest } from "./request.ts";
@@ -27,7 +28,7 @@ async function parsing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
 
   const contentType = request.headers.get("content-type") ||
     app.defaultContentType;
-  const parser = app.contentTypeParsers.get(contentType);
+  const parser = findContentParser(app.contentTypeParsers, contentType);
   if (!parser) {
     reply.status(400).send({
       errorCode: "BAD_CONTENT_TYPE",

@@ -5,6 +5,22 @@ export interface ContentTypeParser {
   (request: DenzoRequest, reply: DenzoReply): Promise<unknown>;
 }
 
+export function findContentParser(
+  parsers: ContentTypeParsers,
+  contentType: string,
+): ContentTypeParser | null {
+  for (const [key, parser] of parsers.entries()) {
+    if (typeof key === "string") {
+      if (key === contentType) return parser;
+      continue;
+    }
+
+    if (key.test(contentType)) return parser;
+  }
+
+  return null;
+}
+
 const jsonCP: ContentTypeParser = async (request, reply) => {
   try {
     const body = await request.raw.json();
@@ -23,9 +39,9 @@ const textCP: ContentTypeParser = async (request, reply) => {
   }
 };
 
-export type ContentTypeParsers = Map<string, ContentTypeParser>;
+export type ContentTypeParsers = Map<(string | RegExp), ContentTypeParser>;
 
 export const defaultParsers: ContentTypeParsers = new Map([
-  ["application/json", jsonCP],
-  ["text/plain", textCP],
+  [/application\/json/, jsonCP],
+  [/application\/text/, textCP],
 ]);
