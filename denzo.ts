@@ -16,21 +16,32 @@ import { defaultSerializer, ReplySerializer } from "./lib/serializer.ts";
 import { noop, serve } from "./lib/server.ts";
 
 export interface DenzoInit {
-  root?: boolean;
+  isRoot?: boolean;
+  name?: string;
   prefix?: string;
   contentTypeParsers?: ContentTypeParsers;
   schemaCompiler?: SchemaCompiler;
   serializer?: ReplySerializer;
   errorHandler?: ErrorHandler;
+  permissions?: Permissions;
 }
 
 export interface RegisterOptions {
   prefix?: string;
+  allowRootHooks?: boolean;
+}
+
+export interface AddHookOptions {
+  scope?: "this" | "root";
 }
 
 export interface Plugin {
   prefix: string;
   context: Denzo;
+}
+
+interface Permissions {
+  rootHook?: Hooks;
 }
 
 export class Denzo {
@@ -41,14 +52,17 @@ export class Denzo {
   errorHandler: ErrorHandler;
   routeTrees: RouteTrees | null;
   fourOhFourRoute: FourOhFourRoute;
+  readonly isRoot: boolean;
   readonly name: string;
   readonly routes: Route[];
   readonly plugins: Plugin[];
   readonly hooks: Hooks;
   protected ready: boolean;
+  protected permissions: Permissions;
 
   constructor(init: DenzoInit = {}) {
-    this.name = "root";
+    this.isRoot = true;
+    this.name = init.name || "root";
     this.ready = false;
     this.routes = [];
     this.plugins = [];
@@ -59,6 +73,7 @@ export class Denzo {
       validators: {},
       is404: true,
     };
+    this.permissions = init.permissions || { rootHook: this.hooks };
 
     this.contentTypeParsers = init.contentTypeParsers || defaultParsers;
     this.defaultContentType = "text/plain";
@@ -74,22 +89,41 @@ export class Denzo {
     this.routes.push(route);
   }
 
-  register(
-    pluginBuilder: PluginBuilder,
-    { prefix }: RegisterOptions = {},
+  register<T>(
+    pluginBuilder: PluginBuilder<T>,
+    { prefix, allowRootHooks }: RegisterOptions = {},
+    pluginConfig?: T,
   ) {
+    if (!this.permissions.rootHook && allowRootHooks) {
+      throw new Error(
+        `Permission denied. plugin '${this.name}' can't grant rootHook access to '${pluginBuilder.name}' plugin`,
+      );
+    }
+
     const context = new Denzo({
+      isRoot: false,
+      name: pluginBuilder.name,
       contentTypeParsers: this.contentTypeParsers,
       schemaCompiler: this.schemaCompiler,
       serializer: this.serializer,
       errorHandler: this.errorHandler,
+      permissions: allowRootHooks ? { rootHook: this.hooks } : {},
     });
 
-    pluginBuilder.fn(context);
+    pluginBuilder.fn(context, pluginConfig);
     this.plugins.push({ prefix: prefix || "", context });
   }
 
-  addHook(name: HookNames, hook: Hook) {
+  addHook(name: HookNames, hook: Hook, options: AddHookOptions = {}) {
+    if (options.scope === "root") {
+      if (!this.permissions.rootHook) {
+        throw new Error(
+          `Permission denied. plugin '${this.name}' has no permission to add a root-level hook`,
+        );
+      }
+
+      addHook(this.permissions.rootHook, name, hook);
+    }
     addHook(this.hooks, name, hook);
   }
 

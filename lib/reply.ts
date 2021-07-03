@@ -1,7 +1,3 @@
-interface ResponseWith {
-  (r: Response | Promise<Response>): Promise<void>;
-}
-
 export interface DefaultReplyTypes {
   Response?: unknown;
 }

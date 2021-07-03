@@ -3,8 +3,8 @@ import { printRoutes } from "../utils/mod.ts";
 
 const app = new Denzo();
 
-const users = createPlugin("users", () => {
-  app.route({
+const users = createPlugin("users", (denzo) => {
+  denzo.route({
     method: "GET",
     url: "/",
     handler() {
@@ -12,7 +12,7 @@ const users = createPlugin("users", () => {
     },
   });
 
-  app.route({
+  denzo.route({
     method: "GET",
     url: "/login",
     handler() {
@@ -21,8 +21,8 @@ const users = createPlugin("users", () => {
   });
 });
 
-const posts = createPlugin("posts", (app: Denzo) => {
-  app.route({
+const posts = createPlugin("posts", (denzo) => {
+  denzo.route({
     method: "GET",
     url: "/",
     handler() {

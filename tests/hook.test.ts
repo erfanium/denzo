@@ -199,3 +199,26 @@ test("[hook] plugin encapsulation", async () => {
   ]);
   assertEquals(await response3.json(), { from: "plugin2" });
 });
+
+test("[hook] plugin root-level hooks", async () => {
+  const order: string[] = [];
+  const app = new Denzo();
+
+  const plugin = createPlugin("plugin", (denzo) => {
+    denzo.addHook("onRequest", () => {
+      order.push("root-onRequest");
+    }, { scope: "root" });
+
+    denzo.addHook("onRequest", () => {
+      order.push("plugin-onRequest");
+    });
+  });
+
+  app.register(plugin, { allowRootHooks: true });
+  app.route({ method: "GET", url: "/", handler() {} });
+  app.finalize();
+  const inject = createInject(app);
+  const response = await inject("/");
+  assertEquals(response.status, 200);
+  assertEquals(order, ["root-onRequest"]);
+});
