@@ -1,7 +1,4 @@
-import {
-  ContentTypeParsers,
-  defaultParsers,
-} from "./lib/contentTypeParsers.ts";
+import { ContentParsers, defaultParsers } from "./lib/contentParser.ts";
 import { defaultErrorHandler, ErrorHandler } from "./lib/errorHandler.ts";
 import { FourOhFourRoute } from "./lib/fourOhFour.ts";
 import { addHook, finalizeHooks, Hook, HookNames, Hooks } from "./lib/hooks.ts";
@@ -19,7 +16,7 @@ export interface DenzoInit {
   isRoot?: boolean;
   name?: string;
   prefix?: string;
-  contentTypeParsers?: ContentTypeParsers;
+  contentParsers?: ContentParsers;
   schemaCompiler?: SchemaCompiler;
   serializer?: ReplySerializer;
   errorHandler?: ErrorHandler;
@@ -45,7 +42,7 @@ interface Permissions {
 }
 
 export class Denzo {
-  contentTypeParsers: ContentTypeParsers;
+  contentParsers: ContentParsers;
   defaultContentType: string;
   schemaCompiler: SchemaCompiler;
   serializer: ReplySerializer;
@@ -75,7 +72,7 @@ export class Denzo {
     };
     this.permissions = init.permissions || { rootHook: this.hooks };
 
-    this.contentTypeParsers = init.contentTypeParsers || defaultParsers;
+    this.contentParsers = init.contentParsers || defaultParsers;
     this.defaultContentType = "text/plain";
     this.schemaCompiler = init.schemaCompiler || buildAjvSchemaCompiler();
     this.serializer = init.serializer || defaultSerializer;
@@ -103,7 +100,7 @@ export class Denzo {
     const context = new Denzo({
       isRoot: false,
       name: pluginBuilder.name,
-      contentTypeParsers: this.contentTypeParsers,
+      contentParsers: this.contentParsers,
       schemaCompiler: this.schemaCompiler,
       serializer: this.serializer,
       errorHandler: this.errorHandler,

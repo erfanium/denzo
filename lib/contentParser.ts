@@ -1,14 +1,14 @@
 import { DenzoReply } from "./reply.ts";
 import { DenzoRequest } from "./request.ts";
 
-export interface ContentTypeParser {
+export interface ContentParser {
   (request: DenzoRequest, reply: DenzoReply): Promise<unknown>;
 }
 
 export function findContentParser(
-  parsers: ContentTypeParsers,
+  parsers: ContentParsers,
   contentType: string,
-): ContentTypeParser | null {
+): ContentParser | null {
   for (const [key, parser] of parsers.entries()) {
     if (typeof key === "string") {
       if (key === contentType) return parser;
@@ -21,7 +21,7 @@ export function findContentParser(
   return null;
 }
 
-const jsonCP: ContentTypeParser = async (request, reply) => {
+const jsonCP: ContentParser = async (request, reply) => {
   try {
     const body = await request.raw.json();
     return body;
@@ -30,7 +30,7 @@ const jsonCP: ContentTypeParser = async (request, reply) => {
   }
 };
 
-const textCP: ContentTypeParser = async (request, reply) => {
+const textCP: ContentParser = async (request, reply) => {
   try {
     const body = await request.raw.text();
     return body;
@@ -39,9 +39,9 @@ const textCP: ContentTypeParser = async (request, reply) => {
   }
 };
 
-export type ContentTypeParsers = Map<(string | RegExp), ContentTypeParser>;
+export type ContentParsers = Map<(string | RegExp), ContentParser>;
 
-export const defaultParsers: ContentTypeParsers = new Map([
+export const defaultParsers: ContentParsers = new Map([
   [/application\/json/, jsonCP],
-  [/application\/text/, textCP],
+  [/text\/plain/, textCP],
 ]);
