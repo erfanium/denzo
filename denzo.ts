@@ -24,7 +24,7 @@ export interface DenzoInit {
 }
 
 export interface RegisterOptions {
-  prefix?: string;
+  prefix?: `/${string}`;
   allowRootHooks?: boolean;
 }
 
@@ -82,7 +82,9 @@ export class Denzo {
   route<T extends DefaultRouteTypes = DefaultRouteTypes>(
     routeInit: RouteInit<T>,
   ) {
-    const route = new Route(this, routeInit);
+    const route = new Route(
+      Object.assign({ schemaCompiler: this.schemaCompiler }, routeInit),
+    );
     this.routes.push(route);
   }
 
