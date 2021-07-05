@@ -1,9 +1,11 @@
 import { Denzo } from "../denzo.ts";
 import { findContentParser } from "./content_parser.ts";
-import { callHook, callHook as _callHook } from "./hooks.ts";
+import { callHook } from "./hooks.ts";
 import { DenzoReply } from "./reply.ts";
 import { DenzoRequest } from "./request.ts";
 import { findRoute } from "./router.ts";
+
+export const noop = () => undefined;
 
 // LC
 async function routing(app: Denzo, request: DenzoRequest, reply: DenzoReply) {
@@ -148,5 +150,6 @@ export async function start(
 
   const response = serialize(app, request, reply);
   reply.responseTime = performance.now() - reply.createdAt;
+  await callHook("onResponse", request, reply, request.route.hooks);
   return response;
 }

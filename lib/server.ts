@@ -1,6 +1,6 @@
 import { Denzo } from "../denzo.ts";
 
-export const noop = (_: unknown) => undefined;
+export const noop = () => undefined;
 
 async function handleConn(app: Denzo, conn: Deno.Conn) {
   for await (const requestEvent of Deno.serveHttp(conn)) {

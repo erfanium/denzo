@@ -2,7 +2,7 @@ import { ContentParsers, defaultParsers } from "./lib/content_parser.ts";
 import { defaultErrorHandler, ErrorHandler } from "./lib/error_handler.ts";
 import { FourOhFourRoute } from "./lib/four_oh_four.ts";
 import { addHook, finalizeHooks, Hook, HookNames, Hooks } from "./lib/hooks.ts";
-import { start } from "./lib/lifecycles.ts";
+import { start } from "./lib/lifecycle.ts";
 import { PluginBuilder } from "./lib/plugin.ts";
 import { DenzoReply } from "./lib/reply.ts";
 import { DenzoRequest } from "./lib/request.ts";

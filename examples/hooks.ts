@@ -24,6 +24,10 @@ app.addHook("onError", (_request, _reply, error) => {
   console.log("onError", error);
 });
 
+app.addHook("onResponse", (_request, _reply) => {
+  console.log("onResponse");
+});
+
 app.route({
   method: "GET",
   url: "/hi",

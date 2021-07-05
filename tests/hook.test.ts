@@ -28,6 +28,10 @@ test("[hook] hook execution order", async () => {
     order.push("preSerialization");
   });
 
+  app.addHook("onResponse", () => {
+    order.push("onResponse");
+  });
+
   app.addHook("onError", () => {
     errors.push("error");
   });
@@ -43,6 +47,7 @@ test("[hook] hook execution order", async () => {
     "preValidation",
     "preHandler",
     "preSerialization",
+    "onResponse",
   ]);
   assertEquals(errors, []);
 });
@@ -68,6 +73,10 @@ test("[hook] 404 hook execution order", async () => {
     order.push("preSerialization");
   });
 
+  app.addHook("onResponse", () => {
+    order.push("onResponse");
+  });
+
   app.addHook("onError", () => {
     errors.push("error");
   });
@@ -80,6 +89,7 @@ test("[hook] 404 hook execution order", async () => {
     "onRequest",
     "preHandler",
     "preSerialization",
+    "onResponse",
   ]);
   assertEquals(errors, []);
 });
