@@ -6,7 +6,8 @@ export type BasicHookNames =
   | "onRequest"
   | "preHandler"
   | "preValidation"
-  | "preSerialization";
+  | "preSerialization"
+  | "onResponse";
 
 export interface Hook {
   (request: DenzoRequest, reply: DenzoReply, error?: Error): unknown;
@@ -44,7 +45,7 @@ export async function callHook(
   name: HookNames,
   request: DenzoRequest,
   reply: DenzoReply,
-  hooks: Hooks = {},
+  hooks: Hooks,
   error?: Error,
 ) {
   const hooksFromApp = getHooks(hooks, name);
