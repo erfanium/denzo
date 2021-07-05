@@ -1,5 +1,5 @@
 import { Denzo } from "../denzo.ts";
-import { findContentParser } from "./contentParser.ts";
+import { findContentParser } from "./content_parser.ts";
 import { callHook, callHook as _callHook } from "./hooks.ts";
 import { DenzoReply } from "./reply.ts";
 import { DenzoRequest } from "./request.ts";

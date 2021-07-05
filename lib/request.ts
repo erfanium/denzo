@@ -1,5 +1,5 @@
-import { FourOhFourRoute } from "./fourOhFour.ts";
-import { HTTPMethods } from "./httpMethods.ts";
+import { FourOhFourRoute } from "./four_oh_four.ts";
+import { HTTPMethods } from "./http_methods.ts";
 import { findKey, getKey, Key, Meta, setKey } from "./keys.ts";
 import { Route } from "./route.ts";
 

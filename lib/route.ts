@@ -2,7 +2,7 @@ import { DenzoRequest } from "./request.ts";
 import { DenzoReply } from "./reply.ts";
 import { SchemaCompiler, ValidatorFunction } from "./schema.ts";
 import { Hook, Hooks } from "./hooks.ts";
-import { allHTTPMethods, HTTPMethods } from "./httpMethods.ts";
+import { allHTTPMethods, HTTPMethods } from "./http_methods.ts";
 
 // deno-lint-ignore ban-types
 export type Schema = Object;

@@ -1,6 +1,6 @@
 import { Denzo } from "../denzo.ts";
 import { Node } from "../deps.ts";
-import { HTTPMethods } from "./httpMethods.ts";
+import { HTTPMethods } from "./http_methods.ts";
 import { Route } from "./route.ts";
 
 type Params = Record<string, string>;

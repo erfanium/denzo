@@ -1,4 +1,4 @@
-import { allHTTPMethods } from "../lib/httpMethods.ts";
+import { allHTTPMethods } from "../lib/http_methods.ts";
 import { Route } from "../lib/route.ts";
 import { assertEquals } from "./deps.ts";
 

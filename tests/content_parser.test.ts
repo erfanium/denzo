@@ -1,4 +1,4 @@
-import { defaultParsers, findContentParser } from "../lib/contentParser.ts";
+import { defaultParsers, findContentParser } from "../lib/content_parser.ts";
 import { assert } from "./deps.ts";
 
 const { test } = Deno;

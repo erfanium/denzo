@@ -1,6 +1,6 @@
-import { ContentParsers, defaultParsers } from "./lib/contentParser.ts";
-import { defaultErrorHandler, ErrorHandler } from "./lib/errorHandler.ts";
-import { FourOhFourRoute } from "./lib/fourOhFour.ts";
+import { ContentParsers, defaultParsers } from "./lib/content_parser.ts";
+import { defaultErrorHandler, ErrorHandler } from "./lib/error_handler.ts";
+import { FourOhFourRoute } from "./lib/four_oh_four.ts";
 import { addHook, finalizeHooks, Hook, HookNames, Hooks } from "./lib/hooks.ts";
 import { start } from "./lib/lifecycles.ts";
 import { PluginBuilder } from "./lib/plugin.ts";
