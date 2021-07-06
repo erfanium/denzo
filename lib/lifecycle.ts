@@ -69,7 +69,9 @@ async function validating(
     if (!error) continue;
     reply.status(400).send({
       errorCode: "VALIDATION_ERROR",
-      message: key + " " + error.message,
+      message: error.instancePath
+        ? `${key} ${error.instancePath} ${error.message}`
+        : `${key} ${error.message}`,
     });
     return;
   }

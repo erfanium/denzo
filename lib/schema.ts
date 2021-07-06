@@ -2,7 +2,7 @@ import { Ajv } from "../deps.ts";
 
 export interface ValidationError {
   message?: string;
-  dataPath: string;
+  instancePath: string;
 }
 
 export interface ValidatorFunction {
@@ -26,7 +26,7 @@ export function buildAjvSchemaCompiler(): SchemaCompiler {
       const result = check(params);
       if (result) return null;
       const error = check.errors![0];
-      return { dataPath: error.schemaPath, message: error.message };
+      return { instancePath: error.instancePath, message: error.message };
     };
   };
 }
