@@ -6,6 +6,9 @@ A Deno framework, similar to Fastify
 
 See [examples](https://github.com/erfanium/denzo/tree/main/examples)
 
+## Discord chat
+https://discord.gg/YP5TgWbd2C
+
 <!-- ## Survey
 
 We are in the process of building a great framework for Deno and your opinion has a direct impact on our work!
