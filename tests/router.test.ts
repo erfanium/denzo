@@ -1,7 +1,7 @@
 import { Denzo } from "../denzo.ts";
 import { findRoute } from "../lib/router.ts";
 import { createPlugin } from "../mod.ts";
-import { assert } from "./deps.ts";
+import { assert, assertEquals } from "./deps.ts";
 
 const { test } = Deno;
 
@@ -84,4 +84,19 @@ test("[router] multiple methods and urls", () => {
   assert(findRoute(app.routeTrees!, "POST", "/foo")[0]);
   assert(findRoute(app.routeTrees!, "GET", "/bar")[0]);
   assert(findRoute(app.routeTrees!, "POST", "/bar")[0]);
+});
+
+test("[router] url params", () => {
+  const app = new Denzo();
+  app.route({
+    method: "GET",
+    url: "/:foo/a/:bar",
+    handler() {},
+  });
+
+  app.finalize();
+
+  const [route, params] = findRoute(app.routeTrees!, "GET", "/abc/a/efg");
+  assert(route);
+  assertEquals(params, { foo: "abc", bar: "efg" });
 });
