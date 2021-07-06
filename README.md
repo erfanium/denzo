@@ -7,6 +7,7 @@ A Deno framework, similar to Fastify
 See [examples](https://github.com/erfanium/denzo/tree/main/examples)
 
 ## Discord chat
+
 https://discord.gg/YP5TgWbd2C
 
 <!-- ## Survey
