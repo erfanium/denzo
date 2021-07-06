@@ -1,7 +1,7 @@
 import { DenzoRequest } from "./request.ts";
 import { DenzoReply } from "./reply.ts";
 import { SchemaCompiler, ValidatorFunction } from "./schema.ts";
-import { Hook, Hooks } from "./hooks.ts";
+import { allHookNames, Hook, HookNames, Hooks } from "./hooks.ts";
 import { allHTTPMethods, HTTPMethods } from "./http_methods.ts";
 
 // deno-lint-ignore ban-types
@@ -29,6 +29,10 @@ export interface RouteInit<T extends DefaultRouteTypes> {
   ): T["Response"] | Promise<T["Response"]> | void | Promise<void>;
   onRequest?: Hook | Hook[];
   preHandler?: Hook | Hook[];
+  preValidation?: Hook | Hook[];
+  preSerialization?: Hook | Hook[];
+  onResponse?: Hook | Hook[];
+  onError?: Hook | Hook[];
   schemaCompiler?: SchemaCompiler;
 }
 
@@ -81,7 +85,8 @@ export class Route<T extends DefaultRouteTypes = DefaultRouteTypes> {
     }
 
     // hooks
-    if (init.onRequest) this.hooks["onRequest"] = toArray(init.onRequest);
-    if (init.preHandler) this.hooks["preHandler"] = toArray(init.preHandler);
+    allHookNames.forEach((hookName) => {
+      if (init[hookName]) this.hooks[hookName] = toArray(init[hookName]!);
+    });
   }
 }

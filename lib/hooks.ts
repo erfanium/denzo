@@ -15,6 +15,15 @@ export interface Hook {
 
 export type HookNames = BasicHookNames | "onError";
 
+export const allHookNames: readonly HookNames[] = [
+  "onRequest",
+  "preHandler",
+  "preValidation",
+  "preSerialization",
+  "onResponse",
+  "onError",
+];
+
 export type Hooks = {
   [key in HookNames]?: Hook[];
 };
