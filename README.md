@@ -1,7 +1,7 @@
 # Denzo
 
 Well designed web framework for Deno. similar to
-(Fastify)[https://github.com/fastify/fastify]. Uses Deno native http server.
+[Fastify](https://github.com/fastify/fastify). Uses Deno native http server.
 (which is unstable right now)
 
 ## Hello world
