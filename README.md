@@ -36,10 +36,12 @@ See [examples](https://github.com/erfanium/denzo/tree/main/examples)
 ## Goals
 
 **Well and Reliable design**: Denzo follows Fastify design which benefit large
-projects. **Fast**: Denzo uses brand new Deno's native http server which is
-faster and better for http/2 protocol. **First-Class validation**: Like Fastify,
-Denzo support JSON schemes (also fluent-json-schema). **Safe**: Plugins are
-limited to their scope, unless you grant access.
+projects.\
+**Fast**: Denzo uses brand new Deno's native http server which is faster and
+better for http/2 protocol.\
+**First-Class validation**: Like Fastify, Denzo support JSON schemes (also
+fluent-json-schema).\
+**Safe**: Plugins are limited to their scope, unless you grant access.
 
 ## Differences with Fastify
 
