@@ -6,6 +6,8 @@ Well designed web framework for Deno. similar to
 
 ## Hello world
 
+app.ts
+
 ```ts
 import { Denzo } from "https://raw.githubusercontent.com/irandeno/denzo/main/mod.ts";
 
@@ -31,13 +33,17 @@ app.serve(listener);
 console.log("listening on port 3000");
 ```
 
+```sh
+deno run --allow-net --unstable app.ts
+```
+
 See [examples](https://github.com/erfanium/denzo/tree/main/examples)
 
 ## Goals
 
 **Well and Reliable design**: Denzo follows Fastify design which benefit large
 projects.\
-**Fast**: Denzo uses brand new Deno's native http server which is faster and
+**Fast**: Denzo uses brand new Deno native http server which is faster and
 better for http/2 protocol.\
 **First-Class validation**: Like Fastify, Denzo support JSON schemes (also
 fluent-json-schema).\
