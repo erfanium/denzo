@@ -59,6 +59,13 @@ your async code.
 Fastify decorators design is not Typescript friendly, You can use our `Keys`
 design to safely pass data between hooks. see examples/keys.ts.
 
+## Plugins
+
+### Official
+
+- [denzo-cors](https://github.com/irandeno/denzo-cors)
+- [denzo-logger](https://github.com/irandeno/denzo-logger)
+
 ## Discord chat
 
 We would love to hear your feedback and questions! https://discord.gg/YP5TgWbd2C
