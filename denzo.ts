@@ -25,11 +25,11 @@ export interface DenzoInit {
 
 export interface RegisterOptions {
   prefix?: `/${string}`;
-  allowRootHooks?: boolean;
+  allowParentHooks?: boolean;
 }
 
 export interface AddHookOptions {
-  scope?: "this" | "root";
+  scope?: "this" | "parent";
 }
 
 export interface Plugin {
@@ -38,7 +38,7 @@ export interface Plugin {
 }
 
 interface Permissions {
-  rootHook?: Hooks;
+  parentHook?: Hooks;
 }
 
 export class Denzo {
@@ -70,7 +70,7 @@ export class Denzo {
       validators: {},
       is404: true,
     };
-    this.permissions = init.permissions || { rootHook: this.hooks };
+    this.permissions = init.permissions || { parentHook: this.hooks };
 
     this.contentParsers = init.contentParsers || defaultParsers;
     this.defaultContentType = "text/plain";
@@ -90,15 +90,9 @@ export class Denzo {
 
   register<T>(
     pluginBuilder: PluginBuilder<T>,
-    { prefix, allowRootHooks }: RegisterOptions = {},
+    { prefix, allowParentHooks }: RegisterOptions = {},
     pluginConfig?: T,
   ) {
-    if (!this.permissions.rootHook && allowRootHooks) {
-      throw new Error(
-        `Permission denied. plugin '${this.name}' can't grant rootHook access to '${pluginBuilder.name}' plugin`,
-      );
-    }
-
     const context = new Denzo({
       isRoot: false,
       name: pluginBuilder.name,
@@ -106,7 +100,7 @@ export class Denzo {
       schemaCompiler: this.schemaCompiler,
       serializer: this.serializer,
       errorHandler: this.errorHandler,
-      permissions: allowRootHooks ? { rootHook: this.hooks } : {},
+      permissions: allowParentHooks ? { parentHook: this.hooks } : {},
     });
 
     pluginBuilder.fn(context, pluginConfig);
@@ -114,14 +108,14 @@ export class Denzo {
   }
 
   addHook(name: HookNames, hook: Hook, options: AddHookOptions = {}) {
-    if (options.scope === "root") {
-      if (!this.permissions.rootHook) {
+    if (options.scope === "parent") {
+      if (!this.permissions.parentHook) {
         throw new Error(
-          `Permission denied. plugin '${this.name}' has no permission to add a root-level hook`,
+          `Permission denied. plugin '${this.name}' has no permission to add a parent-level hook`,
         );
       }
 
-      addHook(this.permissions.rootHook, name, hook);
+      addHook(this.permissions.parentHook, name, hook);
     }
     addHook(this.hooks, name, hook);
   }

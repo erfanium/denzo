@@ -217,14 +217,14 @@ test("[hook] plugin root-level hooks", async () => {
   const plugin = createPlugin("plugin", (denzo) => {
     denzo.addHook("onRequest", () => {
       order.push("root-onRequest");
-    }, { scope: "root" });
+    }, { scope: "parent" });
 
     denzo.addHook("onRequest", () => {
       order.push("plugin-onRequest");
     });
   });
 
-  app.register(plugin, { allowRootHooks: true });
+  app.register(plugin, { allowParentHooks: true });
   app.route({ method: "GET", url: "/", handler() {} });
   app.finalize();
   const inject = createInject(app);
