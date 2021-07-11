@@ -107,7 +107,7 @@ async function errorHandling(
   error: Error,
 ) {
   await app.errorHandler(error, request, reply);
-  callHook(
+  await callHook(
     "onError",
     request,
     reply,
