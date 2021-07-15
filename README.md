@@ -13,7 +13,7 @@ import {
   Denzo,
   listenAndServe,
   printRoutes,
-} from "https://raw.githubusercontent.com/irandeno/denzo/main/mod.ts";
+} from "https://deno.land/x/denzo/mod.ts";
 
 const app = new Denzo();
 
