@@ -10,7 +10,6 @@ import { DefaultRouteTypes, Route, RouteInit } from "./lib/route.ts";
 import { buildTrees, RouteTrees } from "./lib/router.ts";
 import { buildAjvSchemaCompiler, SchemaCompiler } from "./lib/schema.ts";
 import { defaultSerializer, ReplySerializer } from "./lib/serializer.ts";
-import { noop, serve } from "./lib/server.ts";
 
 export interface DenzoInit {
   isRoot?: boolean;
@@ -41,6 +40,7 @@ interface Permissions {
   parentHook?: Hooks;
 }
 
+const noop = () => undefined;
 export class Denzo {
   contentParsers: ContentParsers;
   defaultContentType: string;
@@ -127,20 +127,14 @@ export class Denzo {
     this.ready = true;
   }
 
-  serve(listener: Deno.Listener) {
-    if (!this.ready) this.finalize();
-
-    serve(this, listener);
-  }
-
-  async handle({ request: rawRequest, respondWith }: Deno.RequestEvent) {
+  async handle(requestEvent: Deno.RequestEvent) {
     if (!this.ready) {
       throw new Error("App is not ready! call app.finalize() first");
     }
 
     const reply = new DenzoReply();
-    const request = new DenzoRequest(rawRequest);
+    const request = new DenzoRequest(requestEvent.request);
     const response = await start(this, request, reply);
-    respondWith(response).catch(noop);
+    requestEvent.respondWith(response).catch(noop);
   }
 }

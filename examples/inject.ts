@@ -1,5 +1,4 @@
-import { Denzo } from "../mod.ts";
-import { createInject } from "../utils/inject.ts";
+import { createInject, Denzo } from "../mod.ts";
 
 const app = new Denzo();
 

@@ -1,5 +1,4 @@
-import { createPlugin, Denzo } from "../mod.ts";
-import { printRoutes } from "../utils/mod.ts";
+import { createPlugin, Denzo, listenAndServe, printRoutes } from "../mod.ts";
 
 const app = new Denzo();
 
@@ -18,8 +17,7 @@ app.route({
   },
 });
 
-const listener = Deno.listen({ port: 3000 });
-app.serve(listener);
+listenAndServe(3000, app);
 
-console.log("On port 3030");
+console.log("On port 3000");
 printRoutes(app);

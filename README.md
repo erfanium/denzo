@@ -9,7 +9,11 @@ Well designed web framework for Deno. similar to
 app.ts
 
 ```ts
-import { Denzo } from "https://raw.githubusercontent.com/irandeno/denzo/main/mod.ts";
+import {
+  Denzo,
+  listenAndServe,
+  printRoutes,
+} from "https://raw.githubusercontent.com/irandeno/denzo/main/mod.ts";
 
 const app = new Denzo();
 
@@ -27,8 +31,8 @@ app.route<RouteTypes>({
   },
 });
 
-const listener = Deno.listen({ port: 3000 });
-app.serve(listener);
+listenAndServe(3000, app);
+printRoutes(app);
 
 console.log("listening on port 3000");
 ```

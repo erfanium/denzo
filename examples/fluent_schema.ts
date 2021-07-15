@@ -1,6 +1,5 @@
 import S from "https://esm.sh/fluent-json-schema@3.0.0";
-import { Denzo } from "../mod.ts";
-import { printRoutes } from "../utils/mod.ts";
+import { Denzo, listenAndServe, printRoutes } from "../mod.ts";
 
 const app = new Denzo();
 
@@ -30,8 +29,7 @@ app.route<RouteTypes>({
   },
 });
 
-const listener = Deno.listen({ port: 3000 });
-app.serve(listener);
+listenAndServe(3000, app);
 
-console.log("On port 3030");
+console.log("On port 3000");
 printRoutes(app);
