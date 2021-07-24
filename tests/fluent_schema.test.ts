@@ -31,7 +31,7 @@ test("[fluent-schema] should validate json body", async () => {
   response = await inject("/", {
     method: "POST",
     headers: {
-      "content-type": "application/json",
+      "content-type": "application/json; charset=utf-8",
     },
     body: JSON.stringify({ age: 5 }),
   });

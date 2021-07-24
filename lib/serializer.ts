@@ -12,10 +12,10 @@ export const defaultSerializer: ReplySerializer = (_, reply) => {
   }
 
   if (typeof body === "number" || typeof body === "boolean") {
-    reply.headers.set("content-type", "text/plain");
+    reply.headers.set("content-type", "text/plain; charset=utf-8");
     return body.toString();
   }
 
-  reply.headers.set("content-type", "application/json");
+  reply.headers.set("content-type", "application/json; charset=utf-8");
   return JSON.stringify(body);
 };
