@@ -1,4 +1,4 @@
-export class ESError extends Error {
+export class DenzoError extends Error {
   errorCode: string;
   statusCode: number;
   constructor(errorCode: string, statusCode: number, message: string) {
@@ -13,7 +13,7 @@ export function createError(
   code: string,
   statusCode: number,
   message: string,
-  Base = ESError,
+  Base = DenzoError
 ) {
   return class extends Base {
     constructor() {
