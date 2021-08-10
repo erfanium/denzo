@@ -13,7 +13,7 @@ export function createError(
   code: string,
   statusCode: number,
   message: string,
-  Base = DenzoError
+  Base = DenzoError,
 ) {
   return class extends Base {
     constructor() {
